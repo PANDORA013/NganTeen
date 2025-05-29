@@ -1,4 +1,5 @@
 {{-- resources/views/pembeli/home.blade.php --}}
+@extends('layout.master')
 <!DOCTYPE html>
 <html>
 <head>
