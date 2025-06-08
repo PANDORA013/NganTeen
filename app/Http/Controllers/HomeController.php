@@ -10,8 +10,12 @@ class HomeController extends Controller
 {
     public function index()
     {
-        if (Auth::check() && Auth::user()->role === 'penjual') {
-            return redirect('/penjual/dashboard');
+        if (Auth::check()) {
+            return redirect()->intended(
+                Auth::user()->role === 'penjual' 
+                    ? route('penjual.dashboard') 
+                    : route('pembeli.dashboard')
+            );
         }
         
         // Get featured menus for homepage

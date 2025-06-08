@@ -13,7 +13,7 @@
             NGANTEEN
         </a>
         <nav class="flex gap-6">
-            <a href="#" class="font-semibold text-gray-600 hover:text-black transition">Home</a>
+            <a href="#" class="font-semibold text-gray-600 hover:text-black transition">Dashboard</a>
             <a href="#" class="font-semibold text-gray-600 hover:text-black transition">Service</a>
             <a href="#" class="font-semibold text-gray-600 hover:text-black transition">Contact</a>
             <a href="#" class="font-semibold text-gray-600 hover:text-black transition">Support</a>

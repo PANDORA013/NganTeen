@@ -14,9 +14,21 @@
                         <h3 class="text-lg font-semibold text-gray-800">Pesanan #{{ $order->id }}</h3>
                         <p class="text-sm text-gray-500">{{ $order->created_at->format('d M Y, H:i') }}</p>
                     </div>
-                    <span class="px-4 py-2 rounded-full {{ $order->status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
-                        {{ ucfirst($order->status) }}
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <span class="px-4 py-2 rounded-full {{ $order->getStatusColorClass() }}">
+                            {{ ucfirst($order->status) }}
+                        </span>
+                        @if($order->canBeCancelled())
+                            <form action="{{ route('order.cancel', $order) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" 
+                                        class="px-4 py-2 bg-red-100 text-red-800 rounded-full hover:bg-red-200 transition-colors"
+                                        onclick="return confirm('Yakin ingin membatalkan pesanan ini?')">
+                                    Batalkan
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="space-y-3">
@@ -46,7 +58,7 @@
                 <div class="text-4xl mb-4">🍽️</div>
                 <h3 class="text-xl font-medium text-gray-600 mb-2">Belum Ada Pesanan</h3>
                 <p class="text-gray-500 mb-4">Anda belum memiliki riwayat pesanan</p>
-                <a href="/menu" class="btn-primary inline-block">
+                <a href="{{ route('menu.index') }}" class="btn-primary inline-block">
                     Mulai Pesan
                 </a>
             </div>
