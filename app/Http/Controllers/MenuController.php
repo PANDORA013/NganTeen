@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Menu;
-use App\Http\Requests\MenuRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MenuController extends Controller
 {
@@ -20,108 +20,154 @@ class MenuController extends Controller
     public function index() 
     {
         if (request()->is('penjual/menu*')) {
-            // Penjual view - show only their menus
-            $menus = Menu::where('user_id', Auth::id())->latest()->get();
+            $menus = Menu::where('user_id', Auth::id())
+                        ->latest()
+                        ->get();
             return view('penjual.kelola_menu', compact('menus'));
         }
         
-        // Public menu listing - show all available menus
-        $menus = Menu::where('stok', '>', 0)->latest()->get();
+        $menus = Menu::where('stok', '>', 0)
+                     ->latest()
+                     ->get();
         return view('menu.index', compact('menus'));
     }
 
-    public function create()
-    {
-        return view('penjual.menu.create');
-    }    public function store(Request $request)
+    public function store(Request $request)
     {
         try {
-            $this->validate($request, [
+            $validated = $request->validate([
                 'nama_menu' => 'required|string|max:255',
-                'harga' => 'required|integer|min:0',
+                'harga' => 'required|integer|min:100',
                 'stok' => 'required|integer|min:0',
                 'area_kampus' => 'required|in:Kampus A,Kampus B,Kampus C',
                 'nama_warung' => 'required|string|max:255',
                 'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            ], [
+                'harga.min' => 'Harga minimal adalah Rp 100',
+                'stok.min' => 'Stok tidak boleh negatif',
+                'gambar.max' => 'Ukuran gambar maksimal 2MB',
+                'gambar.mimes' => 'Format gambar harus JPEG, PNG, atau JPG'
             ]);
 
-            $data = $request->all();
+            $data = $validated;
             $data['user_id'] = Auth::id();
 
-            Log::info('Attempting to create menu with data:', ['data' => $data]);
-
             if ($request->hasFile('gambar')) {
-                $gambarPath = $request->file('gambar')->store('menu-images', 'public');
-                if (!$gambarPath) {
-                    throw new \Exception('Failed to store image');
+                $image = $request->file('gambar');
+                $filename = time() . '_' . Str::slug($request->nama_menu) . '.' . $image->getClientOriginalExtension();
+                
+                $path = $image->storeAs('menu-images', $filename, 'public');
+                if (!$path) {
+                    throw new \Exception('Gagal mengupload gambar');
                 }
-                $data['gambar'] = $gambarPath;
-                Log::info('Image stored at:', ['path' => $data['gambar']]);
+                
+                $data['gambar'] = $path;
+                Log::info('Gambar berhasil disimpan:', ['path' => $path]);
             }
 
             $menu = Menu::create($data);
-            Log::info('Menu created successfully:', ['menu_id' => $menu->id]);
+            Log::info('Menu berhasil dibuat:', ['menu_id' => $menu->id]);
 
-            session()->flash('success', 'Menu berhasil ditambahkan!');
-            return redirect()->route('penjual.menu.index');
+            return redirect()
+                ->route('penjual.menu.index')
+                ->with('success', 'Menu berhasil ditambahkan!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($e->errors());
         } catch (\Exception $e) {
-            Log::error('Failed to create menu:', ['error' => $e->getMessage()]);
-            return redirect()->back()
+            Log::error('Gagal membuat menu:', ['error' => $e->getMessage()]);
+            return redirect()
+                ->back()
                 ->withInput()
                 ->withErrors(['error' => 'Gagal menambahkan menu. ' . $e->getMessage()]);
+        }
+    }
+
+    public function update(Request $request, Menu $menu)
+    {
+        try {
+            $this->authorize('update', $menu);
+            
+            $validated = $request->validate([
+                'nama_menu' => 'required|string|max:255',
+                'harga' => 'required|integer|min:100',
+                'stok' => 'required|integer|min:0',
+                'area_kampus' => 'required|in:Kampus A,Kampus B,Kampus C',
+                'nama_warung' => 'required|string|max:255',
+                'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            ], [
+                'harga.min' => 'Harga minimal adalah Rp 100',
+                'stok.min' => 'Stok tidak boleh negatif',
+                'gambar.max' => 'Ukuran gambar maksimal 2MB',
+                'gambar.mimes' => 'Format gambar harus JPEG, PNG, atau JPG'
+            ]);
+
+            $data = $validated;
+
+            if ($request->hasFile('gambar')) {
+                // Delete old image if exists
+                if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+                    Storage::disk('public')->delete($menu->gambar);
+                }
+
+                $image = $request->file('gambar');
+                $filename = time() . '_' . Str::slug($request->nama_menu) . '.' . $image->getClientOriginalExtension();
+                
+                $path = $image->storeAs('menu-images', $filename, 'public');
+                if (!$path) {
+                    throw new \Exception('Gagal mengupload gambar');
+                }
+                
+                $data['gambar'] = $path;
+            }
+
+            $menu->update($data);
+            Log::info('Menu berhasil diperbarui:', ['menu_id' => $menu->id]);
+
+            return redirect()
+                ->back()
+                ->with('success', 'Menu berhasil diperbarui!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors($e->errors());
+        } catch (\Exception $e) {
+            Log::error('Gagal memperbarui menu:', ['error' => $e->getMessage()]);
+            return redirect()
+                ->back()
+                ->withInput()
+                ->withErrors(['error' => 'Gagal memperbarui menu. ' . $e->getMessage()]);
+        }
+    }
+
+    public function destroy(Menu $menu)
+    {
+        try {
+            $this->authorize('delete', $menu);
+            
+            if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
+                Storage::disk('public')->delete($menu->gambar);
+            }
+            
+            $menu->delete();
+            Log::info('Menu berhasil dihapus:', ['menu_id' => $menu->id]);
+
+            return redirect()
+                ->back()
+                ->with('success', 'Menu berhasil dihapus!');
+        } catch (\Exception $e) {
+            Log::error('Gagal menghapus menu:', ['error' => $e->getMessage()]);
+            return redirect()
+                ->back()
+                ->withErrors(['error' => 'Gagal menghapus menu. ' . $e->getMessage()]);
         }
     }
 
     public function show(Menu $menu)
     {
         return view('menu.show', compact('menu'));
-    }
-
-    public function update(Request $request, Menu $menu)
-    {
-        $this->authorize('update', $menu);
-        
-        $this->validate($request, [
-            'nama_menu' => 'required|string|max:255',
-            'harga' => 'required|integer|min:0',
-            'stok' => 'required|integer|min:0',
-            'area_kampus' => 'required|in:Kampus A,Kampus B,Kampus C',
-            'nama_warung' => 'required|string|max:255',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-        ]);
-
-        $data = $request->all();
-
-        if ($request->hasFile('gambar')) {
-            // Delete old image if exists
-            if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
-                Storage::disk('public')->delete($menu->gambar);
-            }
-            $data['gambar'] = $request->file('gambar')->store('menu-images', 'public');
-        } elseif ($request->input('hapus_gambar') == '1') {
-            // Delete image if requested
-            if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
-                Storage::disk('public')->delete($menu->gambar);
-            }
-            $data['gambar'] = null;
-        } else {
-            unset($data['gambar']); // Don't update the image field if no new image
-        }
-
-        $menu->update($data);
-        return redirect()->back()->with('success', 'Menu berhasil diperbarui');
-    }
-
-    public function destroy(Menu $menu)
-    {
-        $this->authorize('delete', $menu);
-        
-        // Delete the image if it exists
-        if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
-            Storage::disk('public')->delete($menu->gambar);
-        }
-        
-        $menu->delete();
-        return redirect()->back()->with('success', 'Menu berhasil dihapus');
     }
 }
