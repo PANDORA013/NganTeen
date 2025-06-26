@@ -12,7 +12,7 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'last_login_at', 'qris_image', 'profile_photo'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -22,7 +22,9 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get all menus owned by the user (as penjual).
+     * Mendapatkan semua menu milik user (sebagai penjual).
+     * 
+     * @return HasMany
      */
     public function menus(): HasMany
     {
@@ -30,7 +32,9 @@ class User extends Authenticatable
     }
 
     /**
-     * Get all orders made by the user (as pembeli).
+     * Mendapatkan semua pesanan yang dibuat user (sebagai pembeli).
+     * 
+     * @return HasMany
      */
     public function orders(): HasMany
     {
@@ -38,7 +42,9 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's cart.
+     * Mendapatkan keranjang belanja user.
+     * 
+     * @return HasOne
      */
     public function cart(): HasOne
     {
@@ -46,17 +52,19 @@ class User extends Authenticatable
     }
 
     /**
-     * Check if user is a seller.
+     * Mengecek apakah user berperan sebagai penjual.
      * 
      * @return bool
      */
     public function isPenjual(): bool
     {
-        return $this->role === 'penjual'; // Value must match 'penjual' in the database
+        return $this->role === 'penjual';
     }
 
     /**
-     * Check if user is a buyer.
+     * Mengecek apakah user berperan sebagai pembeli.
+     * 
+     * @return bool
      */
     public function isPembeli(): bool
     {

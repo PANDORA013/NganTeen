@@ -13,9 +13,20 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6">
+    <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="mt-6 space-y-6">
         @csrf
         @method('patch')
+
+        <div class="mb-3">
+            <x-input-label for="profile_photo" :value="__('Foto Profil')" />
+            <input id="profile_photo" name="profile_photo" type="file" class="form-control @error('profile_photo') is-invalid @enderror" accept="image/*">
+            @error('profile_photo')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+            @if($user->profile_photo)
+                <img src="{{ asset('storage/'.$user->profile_photo) }}" alt="Foto Profil" class="img-thumbnail mt-2" style="max-width: 120px;">
+            @endif
+        </div>
 
         <div>
             <x-input-label for="name" :value="__('Name')" />

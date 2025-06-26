@@ -8,21 +8,52 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model {
-    use HasFactory;    protected $fillable = [
-        'pembeli_id',
-        'total_harga',
-        'status'
+    use HasFactory;
+    
+    protected $fillable = [
+        'user_id',
+        'status',
+        'total',
+        'payment_method',
+        'payment_status',
+        'delivery_address',
+        'notes'
     ];
 
-    // Relasi: order punya banyak order item
-    public function items(): HasMany {
+    /**
+     * Relasi ke model User
+     * 
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Relasi ke model OrderItem
+     * 
+     * @return HasMany
+     */
+    public function orderItems(): HasMany
+    {
         return $this->hasMany(OrderItem::class);
     }
 
     /**
-     * Get the user (pembeli) that owns the order.
+     * Relasi ke model Menu melalui OrderItem
+     * 
+     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
-    public function pembeli(): BelongsTo {
-        return $this->belongsTo(User::class, 'pembeli_id');
+    public function menus()
+    {
+        return $this->hasManyThrough(
+            Menu::class,
+            OrderItem::class,
+            'order_id', // Foreign key on order_items table
+            'id', // Foreign key on menus table
+            'id', // Local key on orders table
+            'menu_id' // Local key on order_items table
+        );
     }
 }

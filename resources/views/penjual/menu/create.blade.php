@@ -1,13 +1,27 @@
-<x-app-layout>
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <h2 class="text-2xl font-semibold mb-6">Tambah Menu Baru</h2>
+@extends('layouts.penjual')
+
+@section('title', 'Tambah Menu Baru')
+
+@section('content')
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h2 class="h5 mb-0">Tambah Menu Baru</h2>
+                </div>
+
+                <div class="card-body">
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
 
                     @if ($errors->any())
-                        <div class="mb-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
-                            <ul class="list-disc list-inside">
+                        <div class="alert alert-danger">
+                            <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
                                     <li>{{ $error }}</li>
                                 @endforeach
@@ -15,65 +29,84 @@
                         </div>
                     @endif
 
-                    <form action="{{ route('penjual.menu.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                    <form action="{{ route('penjual.menu.store') }}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
                         @csrf
                         
-                        <div>
-                            <x-input-label for="nama_menu" :value="__('Nama Menu')" />
-                            <x-text-input id="nama_menu" name="nama_menu" type="text" class="mt-1 block w-full" 
-                                :value="old('nama_menu')" required autofocus />
+                        <div class="mb-3">
+                            <label for="nama_menu" class="form-label">Nama Menu <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('nama_menu') is-invalid @enderror" 
+                                   id="nama_menu" name="nama_menu" value="{{ old('nama_menu') }}" required>
+                            @error('nama_menu')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div>
-                            <x-input-label for="harga" :value="__('Harga')" />
-                            <x-text-input id="harga" name="harga" type="number" class="mt-1 block w-full" 
-                                :value="old('harga')" required min="0" />
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="harga" class="form-label">Harga (Rp) <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rp</span>
+                                    <input type="number" class="form-control @error('harga') is-invalid @enderror" 
+                                           id="harga" name="harga" value="{{ old('harga') }}" min="100" required>
+                                </div>
+                                @error('harga')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="stok" class="form-label">Stok <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control @error('stok') is-invalid @enderror" 
+                                       id="stok" name="stok" value="{{ old('stok', 1) }}" min="0" required>
+                                @error('stok')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
                         </div>
 
-                        <div>
-                            <x-input-label for="stok" :value="__('Stok')" />
-                            <x-text-input id="stok" name="stok" type="number" class="mt-1 block w-full" 
-                                :value="old('stok')" required min="0" />
-                        </div>
-
-                        <div>
-                            <x-input-label for="area_kampus" :value="__('Area Kampus')" />
-                            <select id="area_kampus" name="area_kampus" required
-                                class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
-                                <option value="">Pilih Area Kampus</option>
+                        <div class="mb-3">
+                            <label for="area_kampus" class="form-label">Area Kampus <span class="text-danger">*</span></label>
+                            <select class="form-select @error('area_kampus') is-invalid @enderror" 
+                                    id="area_kampus" name="area_kampus" required>
+                                <option value="" disabled selected>Pilih Area Kampus</option>
                                 <option value="Kampus A" {{ old('area_kampus') == 'Kampus A' ? 'selected' : '' }}>Kampus A</option>
                                 <option value="Kampus B" {{ old('area_kampus') == 'Kampus B' ? 'selected' : '' }}>Kampus B</option>
                                 <option value="Kampus C" {{ old('area_kampus') == 'Kampus C' ? 'selected' : '' }}>Kampus C</option>
                             </select>
+                            @error('area_kampus')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div>
-                            <x-input-label for="nama_warung" :value="__('Nama Warung')" />
-                            <x-text-input id="nama_warung" name="nama_warung" type="text" class="mt-1 block w-full" 
-                                :value="old('nama_warung')" required />
+                        <div class="mb-3">
+                            <label for="nama_warung" class="form-label">Nama Warung <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control @error('nama_warung') is-invalid @enderror" 
+                                   id="nama_warung" name="nama_warung" value="{{ old('nama_warung') }}" required>
+                            @error('nama_warung')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
 
-                        <div>
-                            <x-input-label for="gambar" :value="__('Foto Menu')" />                            <input type="file" id="gambar" name="gambar" accept="image/*"
-                                class="mt-1 block w-full text-sm text-gray-500
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-md file:border-0
-                                    file:text-sm file:font-medium
-                                    file:bg-indigo-50 file:text-indigo-700
-                                    hover:file:bg-indigo-100" />
-                            <p class="mt-1 text-sm text-gray-500">
-                                Format yang diizinkan: JPEG, PNG, JPG. Ukuran maksimal: 2MB
-                            </p>
+                        <div class="mb-4">
+                            <label for="gambar" class="form-label">Foto Menu</label>
+                            <input type="file" class="form-control @error('gambar') is-invalid @enderror" 
+                                   id="gambar" name="gambar" accept="image/*">
+                            <div class="form-text">Format: JPG, JPEG, PNG (Maks. 2MB)</div>
+                            @error('gambar')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            
+                            <div class="mt-2" id="image-preview" style="display: none;">
+                                <img id="preview" src="#" alt="Preview Gambar" class="img-thumbnail" style="max-height: 200px;">
+                            </div>
                         </div>
-                        
-                        <div class="flex items-center justify-end mt-6 gap-4">
-                            <button type="button" onclick="window.history.back()" 
-                                class="inline-flex items-center px-4 py-2 bg-gray-200 border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
-                                Batal
-                            </button>
-                            <button type="submit"
-                                class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Upload Menu
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ route('penjual.menu.index') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i> Kembali
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Simpan Menu
                             </button>
                         </div>
                     </form>
@@ -81,4 +114,48 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+
+@push('scripts')
+<script>
+// Image preview
+function readURL(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const preview = document.getElementById('preview');
+            const previewContainer = document.getElementById('image-preview');
+            
+            preview.src = e.target.result;
+            previewContainer.style.display = 'block';
+        }
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+document.getElementById('gambar').addEventListener('change', function() {
+    readURL(this);
+});
+
+// Form validation
+(function () {
+    'use strict'
+    
+    const forms = document.querySelectorAll('.needs-validation')
+    
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+            if (!form.checkValidity()) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            
+            form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>
+@endpush
+@endsection

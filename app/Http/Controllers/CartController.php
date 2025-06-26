@@ -7,15 +7,26 @@ use App\Models\Menu;
 use App\Http\Requests\CartRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class CartController extends Controller
 {
+    /**
+     * Constructor - menambahkan middleware
+     */
     public function __construct()
     {
         $this->middleware(['auth', 'role:pembeli']);
     }
 
-    public function index() {
+    /**
+     * Menampilkan isi keranjang belanja
+     * 
+     * @return View
+     */
+    public function index(): View
+    {
         $keranjang = Cart::with('menu')
             ->where('user_id', Auth::id())
             ->get();
@@ -27,10 +38,17 @@ class CartController extends Controller
         return view('pembeli.keranjang', compact('keranjang', 'total'));
     }
 
-    public function store(CartRequest $request) {
+    /**
+     * Menambahkan item ke keranjang
+     * 
+     * @param CartRequest $request
+     * @return RedirectResponse
+     */
+    public function store(CartRequest $request): RedirectResponse
+    {
         $menu = Menu::findOrFail($request->menu_id);
         
-        // Check if menu is already in cart
+        // Cek apakah menu sudah ada di keranjang
         $existingCart = Cart::where('user_id', Auth::id())
             ->where('menu_id', $request->menu_id)
             ->first();
@@ -59,7 +77,15 @@ class CartController extends Controller
             ->with('success', 'Item berhasil ditambahkan ke keranjang');
     }
 
-    public function update(CartRequest $request, $id) {
+    /**
+     * Mengupdate jumlah item di keranjang
+     * 
+     * @param CartRequest $request
+     * @param int $id
+     * @return RedirectResponse
+     */
+    public function update(CartRequest $request, int $id): RedirectResponse
+    {
         $cart = Cart::where('user_id', Auth::id())
             ->findOrFail($id);
 
@@ -70,7 +96,14 @@ class CartController extends Controller
             ->with('success', 'Jumlah item berhasil diperbarui');
     }
 
-    public function destroy($id) {
+    /**
+     * Menghapus item dari keranjang
+     * 
+     * @param int $id
+     * @return RedirectResponse
+     */
+    public function destroy(int $id): RedirectResponse
+    {
         $cart = Cart::where('user_id', Auth::id())
             ->findOrFail($id);
             

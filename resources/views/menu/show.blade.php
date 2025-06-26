@@ -1,58 +1,315 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="md:flex">
-            <div class="md:w-1/2">
-                @if($menu->image)
-                    <img src="{{ asset('storage/'.$menu->image) }}" alt="{{ $menu->nama_menu }}" class="w-full h-96 object-cover">
-                @else
-                    <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
-                        <span class="text-gray-500">No image</span>
-                    </div>
-                @endif
-            </div>
-            <div class="p-8 md:w-1/2">
-                <div class="mb-4">
-                    <h1 class="text-3xl font-bold mb-2">{{ $menu->nama_menu }}</h1>
-                    <p class="text-gray-600">{{ $menu->description ?? 'Tidak ada deskripsi' }}</p>
-                </div>
-                
-                <div class="mb-6">
-                    <p class="text-2xl font-bold text-orange-500 mb-2">
-                        Rp {{ number_format($menu->harga, 0, ',', '.') }}
-                    </p>
-                    <p class="text-gray-600">Stok: {{ $menu->stok }}</p>
-                    <p class="text-gray-600">{{ $menu->nama_warung }} - {{ $menu->area_kampus }}</p>
-                </div>
+<div class="container py-4 py-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('menu.index') }}">Menu</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ $menu->nama_menu }}</li>
+                </ol>
+            </nav>
 
-                @auth
-                    @if(auth()->user()->role === 'pembeli' && $menu->stok > 0)
-                        <form action="{{ route('pembeli.cart.store') }}" method="POST" class="space-y-4">
-                            @csrf
-                            <input type="hidden" name="menu_id" value="{{ $menu->id }}">
-                            <div>
-                                <label for="jumlah" class="block text-sm font-medium text-gray-700">Jumlah</label>
-                                <input type="number" name="jumlah" id="jumlah" min="1" max="{{ $menu->stok }}" value="1" 
-                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500">
-                            </div>
-                            <button type="submit" class="w-full bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transition duration-300">
-                                Tambah ke Keranjang
-                            </button>
-                        </form>
-                    @elseif($menu->stok === 0)
-                        <div class="bg-gray-100 text-gray-600 px-6 py-3 rounded-full text-center">
-                            Stok Habis
+            <!-- Menu Card -->
+            <div class="card shadow-sm border-0 overflow-hidden mb-5">
+                <div class="position-relative">
+                    @if($menu->image)
+                        <img src="{{ asset('storage/'.$menu->image) }}" class="card-img-top object-fit-cover" style="height: 400px" alt="{{ $menu->nama_menu }}">
+                    @else
+                        <div class="bg-light d-flex align-items-center justify-content-center" style="height: 400px">
+                            <i class="fas fa-utensils fa-4x text-muted"></i>
                         </div>
                     @endif
-                @else
-                    <a href="{{ route('login') }}" class="block w-full bg-orange-500 text-white px-6 py-3 rounded-full hover:bg-orange-600 transition duration-300 text-center">
-                        Login untuk Memesan
-                    </a>
-                @endauth
+                    
+                    <!-- Location Badge -->
+                    <span class="badge bg-primary position-absolute top-0 end-0 m-3 fs-6">
+                        <i class="fas fa-map-marker-alt me-1"></i> {{ $menu->area_kampus }}
+                    </span>
+                    
+                    <!-- Favorite Button -->
+                    @auth
+                        <button class="btn btn-light position-absolute top-0 start-0 m-3 p-3 rounded-circle shadow-sm" 
+                                onclick="toggleFavorite({{ $menu->id }})"
+                                data-bs-toggle="tooltip" data-bs-placement="right" 
+                                title="{{ $menu->isFavoritedBy(auth()->user()) ? 'Hapus dari favorit' : 'Tambahkan ke favorit' }}"
+                                id="favoriteBtn">
+                            <i class="fas fa-heart {{ $menu->isFavoritedBy(auth()->user()) ? 'text-danger' : 'text-muted' }} fa-lg"></i>
+                        </button>
+                    @endauth
+                </div>
+                
+                <div class="card-body p-4 p-lg-5">
+                    <!-- Menu Header -->
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h1 class="h2 fw-bold mb-2">{{ $menu->nama_menu }}</h1>
+                            <h3 class="h5 text-muted">{{ $menu->nama_warung }}</h3>
+                        </div>
+                        <div class="text-end">
+                            <div class="h3 fw-bold text-primary mb-1">Rp {{ number_format($menu->harga, 0, ',', '.') }}</div>
+                            <span class="badge bg-{{ $menu->stok > 0 ? 'success' : 'danger' }} px-3 py-2">
+                                <i class="fas fa-{{ $menu->stok > 0 ? 'check' : 'times' }}-circle me-1"></i>
+                                {{ $menu->stok > 0 ? 'Tersedia' : 'Habis' }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Rating -->
+                    <div class="d-flex align-items-center mb-4">
+                        <div class="rating-stars me-2">
+                            @for($i = 1; $i <= 5; $i++)
+                                <i class="fas fa-star {{ $i <= round($menu->averageRating()) ? 'text-warning' : 'text-light' }}"></i>
+                            @endfor
+                        </div>
+                        <small class="text-muted">({{ $menu->ratings->count() }} ulasan)</small>
+                        <span class="mx-2 text-muted">•</span>
+                        <span class="text-muted"><i class="fas fa-clock me-1"></i> {{ $menu->estimated_time }} menit</span>
+                    </div>
+                    
+                    <!-- Description -->
+                    <div class="mb-4">
+                        <h5 class="fw-bold mb-3"><i class="fas fa-info-circle text-primary me-2"></i>Deskripsi Menu</h5>
+                        <p class="mb-0">{{ $menu->description ?? 'Tidak ada deskripsi tersedia' }}</p>
+                    </div>
+                    
+                    <!-- Order Form -->
+                    @auth
+                        @if(auth()->user()->role === 'pembeli' && $menu->stok > 0)
+                            <form action="{{ route('pembeli.cart.store') }}" method="POST" class="mb-4">
+                                @csrf
+                                <input type="hidden" name="menu_id" value="{{ $menu->id }}">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-4">
+                                        <label for="jumlah" class="form-label fw-bold">Jumlah Pesanan</label>
+                                        <div class="input-group">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepDown()">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                            <input type="number" name="jumlah" id="jumlah" 
+                                                class="form-control text-center" min="1" max="{{ $menu->stok }}" value="1">
+                                            <button class="btn btn-outline-secondary" type="button" onclick="this.parentNode.querySelector('input[type=number]').stepUp()">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary btn-lg w-100 py-3" id="addToCartBtn">
+                                            <i class="fas fa-cart-plus me-2"></i>Tambah ke Keranjang
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        @elseif($menu->stok === 0)
+                            <div class="alert alert-warning text-center py-3 mb-4">
+                                <i class="fas fa-exclamation-circle me-2"></i>Stok menu ini sedang habis
+                            </div>
+                        @endif
+                    @else
+                        <div class="alert alert-info text-center py-3 mb-4">
+                            <i class="fas fa-info-circle me-2"></i>Silakan <a href="{{ route('login') }}" class="alert-link">login</a> untuk memesan menu ini
+                        </div>
+                    @endauth
+                    
+                    <!-- Recommended Menus -->
+                    @if($menu->recommendedMenus->isNotEmpty())
+                        <div class="mt-5 pt-4 border-top">
+                            <h4 class="h4 fw-bold mb-4"><i class="fas fa-utensils text-primary me-2"></i>Menu Rekomendasi</h4>
+                            <div class="row g-3">
+                                @foreach($menu->recommendedMenus as $recommended)
+                                    <div class="col-md-6 col-lg-4">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <a href="{{ route('menu.show', $recommended->id) }}" class="text-decoration-none">
+                                                @if($recommended->image)
+                                                    <img src="{{ asset('storage/'.$recommended->image) }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="{{ $recommended->nama_menu }}">
+                                                @else
+                                                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px">
+                                                        <i class="fas fa-utensils fa-3x text-muted"></i>
+                                                    </div>
+                                                @endif
+                                            </a>
+                                            <div class="card-body">
+                                                <h5 class="card-title fw-bold mb-1">{{ $recommended->nama_menu }}</h5>
+                                                <p class="text-muted small mb-2">{{ $recommended->nama_warung }}</p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold text-primary">Rp {{ number_format($recommended->harga, 0, ',', '.') }}</span>
+                                                    <span class="badge bg-{{ $recommended->stok > 0 ? 'success' : 'danger' }} px-2">
+                                                        {{ $recommended->stok > 0 ? 'Tersedia' : 'Habis' }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                    
+                    <!-- Reviews Section -->
+                    <div class="mt-5 pt-4 border-top">
+                        <h4 class="h4 fw-bold mb-4"><i class="fas fa-comments text-primary me-2"></i>Ulasan Pelanggan</h4>
+                        
+                        @auth
+                            <div class="card mb-4 border-0 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="h5 mb-3">Tulis Ulasan Anda</h5>
+                                    <form action="{{ route('menu.rating.store', $menu->id) }}" method="POST" id="reviewForm">
+                                        @csrf
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Rating</label>
+                                            <div class="rating-input">
+                                                @for($i = 5; $i >= 1; $i--)
+                                                    <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
+                                                    <label for="star{{ $i }}" class="star-label"><i class="fas fa-star"></i></label>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <textarea name="review" class="form-control" rows="3" placeholder="Bagikan pengalaman Anda..." required></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary px-4" id="submitReviewBtn">
+                                            <span class="submit-text">Kirim Ulasan</span>
+                                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        @endauth
+                        
+                        <div class="reviews-list">
+                            @forelse($menu->ratings as $rating)
+                                <div class="card mb-3 border-0 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <h6 class="card-title fw-bold mb-0">{{ $rating->user->name }}</h6>
+                                            <div class="text-warning">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fas fa-star {{ $i <= $rating->rating ? 'text-warning' : 'text-light' }}"></i>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        <p class="card-text mb-2">{{ $rating->review }}</p>
+                                        <small class="text-muted">{{ $rating->created_at->diffForHumans() }}</small>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-4">
+                                    <i class="fas fa-comment-slash fa-2x text-muted mb-3"></i>
+                                    <p class="text-muted">Belum ada ulasan untuk menu ini</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <div class="mt-4 text-center">
+                <a href="{{ route('menu.index') }}" class="btn btn-outline-primary px-4">
+                    <i class="fas fa-arrow-left me-2"></i>Kembali ke Daftar Menu
+                </a>
             </div>
         </div>
     </div>
 </div>
+
+@section('scripts')
+<script>
+function toggleFavorite(menuId) {
+    const btn = document.getElementById('favoriteBtn');
+    const icon = btn.querySelector('i');
+    
+    btn.disabled = true;
+    
+    fetch(`/menu/${menuId}/favorite`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            if(data.is_favorited) {
+                icon.classList.remove('text-muted');
+                icon.classList.add('text-danger');
+                btn.setAttribute('title', 'Hapus dari favorit');
+            } else {
+                icon.classList.remove('text-danger');
+                icon.classList.add('text-muted');
+                btn.setAttribute('title', 'Tambahkan ke favorit');
+            }
+            
+            // Update tooltip
+            const tooltip = bootstrap.Tooltip.getInstance(btn);
+            if (tooltip) {
+                tooltip.dispose();
+                new bootstrap.Tooltip(btn);
+            }
+        }
+    })
+    .finally(() => {
+        btn.disabled = false;
+    });
+}
+
+// Form submission handling
+const reviewForm = document.getElementById('reviewForm');
+if(reviewForm) {
+    reviewForm.addEventListener('submit', function(e) {
+        const btn = document.getElementById('submitReviewBtn');
+        const spinner = btn.querySelector('.spinner-border');
+        const text = btn.querySelector('.submit-text');
+        
+        btn.disabled = true;
+        spinner.classList.remove('d-none');
+        text.textContent = 'Mengirim...';
+    });
+}
+
+// Initialize tooltips
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl);
+});
+
+// Star rating hover effect
+const starLabels = document.querySelectorAll('.star-label');
+if(starLabels) {
+    starLabels.forEach(label => {
+        label.addEventListener('mouseover', function() {
+            const rating = this.getAttribute('for').replace('star', '');
+            highlightStars(rating);
+        });
+        
+        label.addEventListener('mouseout', function() {
+            const checked = document.querySelector('input[name="rating"]:checked');
+            highlightStars(checked ? checked.value : 0);
+        });
+    });
+    
+    document.querySelectorAll('input[name="rating"]').forEach(input => {
+        input.addEventListener('change', function() {
+            highlightStars(this.value);
+        });
+    });
+}
+
+function highlightStars(rating) {
+    const stars = document.querySelectorAll('.star-label i');
+    stars.forEach((star, index) => {
+        if(index < rating) {
+            star.classList.add('text-warning');
+            star.classList.remove('text-light');
+        } else {
+            star.classList.remove('text-warning');
+            star.classList.add('text-light');
+        }
+    });
+}
+</script>
+@endsection
 @endsection

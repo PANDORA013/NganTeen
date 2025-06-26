@@ -36,20 +36,34 @@ class RegisteredUserController extends Controller
             'role' => ['required', 'string', 'in:penjual,pembeli'],
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
+        try {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+            ]);
 
-        event(new Registered($user));
+            event(new Registered($user));
 
-        Auth::login($user);
+            Auth::login($user);
+            
+            Log::info('User berhasil registrasi', ['user_id' => $user->id]);
 
-        // Redirect based on role to the proper named route
-        return redirect()->intended(
-            $user->isPenjual() ? route('penjual.dashboard') : route('pembeli.dashboard')
-        );
+            // Redirect based on role to the proper named route
+            return redirect()->intended(
+                $user->isPenjual() ? route('penjual.dashboard') : route('pembeli.dashboard')
+            );
+        } catch (\Exception $e) {
+            Log::error('Error saat registrasi: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString(),
+                'input' => $request->except('password')
+            ]);
+            
+            return back()->withErrors([
+                'email' => 'Terjadi kesalahan saat melakukan registrasi. Silakan coba lagi.'
+            ])->withInput();
+        }
     }
 }

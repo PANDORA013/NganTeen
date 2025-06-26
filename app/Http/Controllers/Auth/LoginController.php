@@ -13,17 +13,17 @@ class LoginController extends Controller
     | Login Controller
     |--------------------------------------------------------------------------
     |
-    | This controller handles authenticating users for the application and
-    | redirecting them to your home screen. The controller uses a trait
-    | to conveniently provide its functionality to your applications.
+    | Controller ini menangani autentikasi pengguna untuk aplikasi dan
+    | mengarahkan mereka ke halaman beranda. Controller menggunakan trait
+    | untuk menyediakan fungsionalitasnya ke aplikasi Anda.
     |
     */
 
     use AuthenticatesUsers;
 
     /**
-     * Create a new controller instance.
-     *
+     * Membuat instance controller baru.
+     * 
      * @return void
      */
     public function __construct()
@@ -33,11 +33,11 @@ class LoginController extends Controller
     }
 
     /**
-     * Determine where to redirect users after login based on their role.
-     *
+     * Menentukan redirect pengguna setelah login berdasarkan role.
+     * 
      * @return string
      */
-    protected function redirectTo()
+    protected function redirectTo(): string
     {
         if (Auth::user()->role === 'penjual') {
             return '/penjual/dashboard';

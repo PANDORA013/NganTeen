@@ -26,13 +26,13 @@ class CheckoutController extends Controller
             $keranjang = Cart::with('menu')->where('user_id', $user->id)->get();
             
             if ($keranjang->isEmpty()) {
-                return redirect()->route('cart.index')->with('error', 'Keranjang belanja kosong');
+                return redirect()->route('pembeli.cart.index')->with('error', 'Keranjang belanja kosong');
             }
 
             // Validate stock availability
             foreach ($keranjang as $item) {
                 if ($item->menu->stok < $item->jumlah) {
-                    return redirect()->route('cart.index')
+                    return redirect()->route('pembeli.cart.index')
                         ->with('error', "Stok {$item->menu->nama_menu} tidak mencukupi");
                 }
             }
@@ -67,12 +67,61 @@ class CheckoutController extends Controller
             Cart::where('user_id', $user->id)->delete();
 
             DB::commit();
-            return redirect()->route('order.history')->with('success', 'Pesanan berhasil dibuat');
+            return redirect()->route('pembeli.orders.index')->with('success', 'Pesanan berhasil dibuat');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('cart.index')
+            return redirect()->route('pembeli.cart.index')
                 ->with('error', 'Terjadi kesalahan saat memproses pesanan');
+        }
+    }
+
+    /**
+     * Proses checkout dari keranjang
+     */
+    public function process(Request $request)
+    {
+        $user = Auth::user();
+        $cartItems = Cart::where('user_id', $user->id)->with('menu')->get();
+        if ($cartItems->isEmpty()) {
+            return redirect()->back()->with('error', 'Keranjang kosong!');
+        }
+
+        DB::beginTransaction();
+        try {
+            $total = 0;
+            foreach ($cartItems as $item) {
+                // Validasi stok
+                if ($item->menu->stok < $item->jumlah) {
+                    DB::rollBack();
+                    return redirect()->back()->with('error', "Stok {$item->menu->nama_menu} tidak mencukupi");
+                }
+                $total += $item->menu->harga * $item->jumlah;
+            }
+            // Pastikan field relasi order adalah pembeli_id
+            $order = Order::create([
+                'pembeli_id' => $user->id,
+                'status' => 'pending',
+                'total_harga' => $total,
+            ]);
+            foreach ($cartItems as $item) {
+                \App\Models\OrderItem::create([
+                    'order_id' => $order->id,
+                    'menu_id' => $item->menu_id,
+                    'jumlah' => $item->jumlah,
+                    'harga' => $item->menu->harga,
+                ]);
+                // Update stok menu
+                $menu = $item->menu;
+                $menu->stok -= $item->jumlah;
+                $menu->save();
+            }
+            Cart::where('user_id', $user->id)->delete();
+            DB::commit();
+            return redirect()->route('pembeli.orders.index')->with('success', 'Checkout berhasil! Silakan lakukan pembayaran langsung ke kantin setelah status pesanan menjadi "Siap Diambil".');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Checkout gagal!');
         }
     }
 

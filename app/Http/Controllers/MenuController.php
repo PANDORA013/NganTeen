@@ -8,33 +8,90 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class MenuController extends Controller
 {
+    /**
+     * Constructor, menambahkan middleware
+     */
     public function __construct()
     {
         $this->middleware('auth')->except(['index', 'show']);
         $this->middleware('role:penjual')->only(['create', 'store', 'edit', 'update', 'destroy']);
     }
 
-    public function index() 
+    /**
+     * Menampilkan daftar menu untuk penjual
+     * 
+     * @return View
+     */
+    public function index(): View
     {
-        if (request()->is('penjual/menu*')) {
-            $menus = Menu::where('user_id', Auth::id())
-                        ->latest()
-                        ->get();
-            return view('penjual.kelola_menu', compact('menus'));
-        }
-        
+        $menus = Menu::where('user_id', Auth::id())
+                    ->latest()
+                    ->get();
+        return view('penjual.menu.index', compact('menus'));
+    }
+    
+    /**
+     * Menampilkan daftar menu untuk pembeli
+     * 
+     * @return View
+     */
+    public function publicIndex(): View
+    {
         $menus = Menu::where('stok', '>', 0)
                      ->latest()
-                     ->get();
+                     ->paginate(12);
         return view('menu.index', compact('menus'));
     }
+    
+    /**
+     * Menampilkan detail menu untuk pembeli
+     * 
+     * @param Menu $menu
+     * @return View
+     */
+    public function publicShow(Menu $menu): View
+    {
+        return view('menu.show', compact('menu'));
+    }
 
-    public function store(Request $request)
+    /**
+     * Form tambah menu baru
+     * 
+     * @return View
+     */
+    public function create(): View
+    {
+        return view('penjual.menu.create');
+    }
+
+    /**
+     * Form edit menu
+     * 
+     * @param Menu $menu
+     * @return View
+     */
+    public function edit(Menu $menu): View
+    {
+        $this->authorize('update', $menu);
+        return view('penjual.menu.edit', compact('menu'));
+    }
+
+    /**
+     * Proses simpan menu baru
+     * 
+     * @param Request $request
+     * @return RedirectResponse
+     */
+    public function store(Request $request): RedirectResponse
     {
         try {
+            $this->authorize('create', Menu::class);
+            
             $validated = $request->validate([
                 'nama_menu' => 'required|string|max:255',
                 'harga' => 'required|integer|min:100',
@@ -42,11 +99,6 @@ class MenuController extends Controller
                 'area_kampus' => 'required|in:Kampus A,Kampus B,Kampus C',
                 'nama_warung' => 'required|string|max:255',
                 'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            ], [
-                'harga.min' => 'Harga minimal adalah Rp 100',
-                'stok.min' => 'Stok tidak boleh negatif',
-                'gambar.max' => 'Ukuran gambar maksimal 2MB',
-                'gambar.mimes' => 'Format gambar harus JPEG, PNG, atau JPG'
             ]);
 
             $data = $validated;
@@ -65,19 +117,13 @@ class MenuController extends Controller
                 Log::info('Gambar berhasil disimpan:', ['path' => $path]);
             }
 
-            $menu = Menu::create($data);
-            Log::info('Menu berhasil dibuat:', ['menu_id' => $menu->id]);
+            Menu::create($data);
 
             return redirect()
                 ->route('penjual.menu.index')
                 ->with('success', 'Menu berhasil ditambahkan!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors($e->errors());
         } catch (\Exception $e) {
-            Log::error('Gagal membuat menu:', ['error' => $e->getMessage()]);
+            Log::error('Gagal menambahkan menu:', ['error' => $e->getMessage()]);
             return redirect()
                 ->back()
                 ->withInput()
@@ -85,7 +131,14 @@ class MenuController extends Controller
         }
     }
 
-    public function update(Request $request, Menu $menu)
+    /**
+     * Proses update menu
+     * 
+     * @param Request $request
+     * @param Menu $menu
+     * @return RedirectResponse
+     */
+    public function update(Request $request, Menu $menu): RedirectResponse
     {
         try {
             $this->authorize('update', $menu);
@@ -97,21 +150,15 @@ class MenuController extends Controller
                 'area_kampus' => 'required|in:Kampus A,Kampus B,Kampus C',
                 'nama_warung' => 'required|string|max:255',
                 'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            ], [
-                'harga.min' => 'Harga minimal adalah Rp 100',
-                'stok.min' => 'Stok tidak boleh negatif',
-                'gambar.max' => 'Ukuran gambar maksimal 2MB',
-                'gambar.mimes' => 'Format gambar harus JPEG, PNG, atau JPG'
             ]);
 
             $data = $validated;
-
+            
             if ($request->hasFile('gambar')) {
-                // Delete old image if exists
                 if ($menu->gambar && Storage::disk('public')->exists($menu->gambar)) {
                     Storage::disk('public')->delete($menu->gambar);
                 }
-
+                
                 $image = $request->file('gambar');
                 $filename = time() . '_' . Str::slug($request->nama_menu) . '.' . $image->getClientOriginalExtension();
                 
@@ -121,19 +168,14 @@ class MenuController extends Controller
                 }
                 
                 $data['gambar'] = $path;
+                Log::info('Gambar berhasil diupdate:', ['path' => $path]);
             }
 
             $menu->update($data);
-            Log::info('Menu berhasil diperbarui:', ['menu_id' => $menu->id]);
-
+            
             return redirect()
-                ->back()
+                ->route('penjual.menu.index')
                 ->with('success', 'Menu berhasil diperbarui!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect()
-                ->back()
-                ->withInput()
-                ->withErrors($e->errors());
         } catch (\Exception $e) {
             Log::error('Gagal memperbarui menu:', ['error' => $e->getMessage()]);
             return redirect()
@@ -143,7 +185,13 @@ class MenuController extends Controller
         }
     }
 
-    public function destroy(Menu $menu)
+    /**
+     * Proses hapus menu
+     * 
+     * @param Menu $menu
+     * @return RedirectResponse
+     */
+    public function destroy(Menu $menu): RedirectResponse
     {
         try {
             $this->authorize('delete', $menu);
@@ -166,7 +214,13 @@ class MenuController extends Controller
         }
     }
 
-    public function show(Menu $menu)
+    /**
+     * Menampilkan detail menu
+     * 
+     * @param Menu $menu
+     * @return View
+     */
+    public function show(Menu $menu): View
     {
         return view('menu.show', compact('menu'));
     }

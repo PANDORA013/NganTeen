@@ -8,9 +8,11 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Http\Traits\UpdatesLastLoginAt;
 
 class AuthenticatedSessionController extends Controller
 {
+    use UpdatesLastLoginAt;
     /**
      * Display the login view.
      */
@@ -27,6 +29,9 @@ class AuthenticatedSessionController extends Controller
         $request->authenticate();
 
         $request->session()->regenerate();
+
+        // Update last login timestamp
+        $this->updateLastLoginTimestamp();
 
         // Redirect based on role to the proper named route
         return redirect()->intended(

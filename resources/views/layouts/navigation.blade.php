@@ -27,7 +27,7 @@
                             {{ __('Pesanan') }}
                         </x-nav-link>
                     @else
-                        <x-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
+                        <x-nav-link :href="route('pembeli.cart.index')" :active="request()->routeIs('pembeli.cart.*')">
                             {{ __('Keranjang') }}
                         </x-nav-link>
                         <x-nav-link :href="route('pembeli.orders.index')" :active="request()->routeIs('pembeli.orders.*')">
@@ -69,7 +69,7 @@
 
             <!-- Hamburger (Mobile) -->
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none">
+                <button @click="open = ! open" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none" aria-label="Toggle navigation menu">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{ 'hidden': open, 'inline-flex': !open }" class="inline-flex"
                               stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -99,7 +99,7 @@
                     {{ __('Pesanan') }}
                 </x-responsive-nav-link>
             @else
-                <x-responsive-nav-link :href="route('cart.index')" :active="request()->routeIs('cart.*')">
+                <x-responsive-nav-link :href="route('pembeli.cart.index')" :active="request()->routeIs('pembeli.cart.*')">
                     {{ __('Keranjang') }}
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('pembeli.orders.index')" :active="request()->routeIs('pembeli.orders.*')">
