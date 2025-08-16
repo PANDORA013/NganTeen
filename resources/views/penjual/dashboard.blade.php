@@ -2,75 +2,100 @@
 
 @section('content')
 <div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span>Dashboard Penjual</span>
-                        <button id="refreshStats" class="btn btn-sm btn-outline-secondary">
-                            <i class="fas fa-sync-alt"></i> Perbarui
-                        </button>
-                    </div>
+    <!-- Professional Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center py-3">
+                <div>
+                    <h1 class="h2 mb-1" style="color: var(--text-primary);">
+                        <i class="fas fa-tachometer-alt me-2" style="color: var(--primary);"></i>
+                        Dashboard Seller
+                    </h1>
+                    <p class="text-muted mb-0">Kelola bisnis Anda dengan mudah dan efisien</p>
                 </div>
+                <div>
+                    <button id="refreshStats" class="btn btn-accent">
+                        <i class="fas fa-sync-alt me-2"></i>Refresh Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <div class="card-body">
-                    <!-- Statistik -->
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="card mb-4">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Total Menu</h5>
-                                    <p id="menuCount" class="h4">{{ $menuCount ?? 0 }}</p>
-                                    <p class="text-muted mb-0">Menu aktif di toko Anda</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card mb-4">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Pesanan Baru</h5>
-                                    <p id="newOrders" class="h4">{{ $newOrders ?? 0 }}</p>
-                                    <p class="text-muted mb-0">Menunggu konfirmasi</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card mb-4">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">Total Pendapatan</h5>
-                                    <p id="totalRevenue" class="h4">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</p>
-                                    <p class="text-muted mb-0">Dari pesanan selesai</p>
-                                </div>
-                            </div>
-                        </div>
+    <!-- Professional Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card stats-card h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-utensils fa-2x" style="color: var(--primary);"></i>
                     </div>
-
-                    <!-- Aksi Cepat -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            Aksi Cepat
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex flex-wrap gap-2">
-                                <a href="{{ route('penjual.menu.create') }}" class="btn btn-primary">
-                                    <i class="fas fa-plus me-1"></i> Tambah Menu Baru
-                                </a>
-                                <a href="{{ route('penjual.orders.index') }}" class="btn btn-outline-secondary">
-                                    <i class="fas fa-shopping-bag me-1"></i> Lihat Semua Pesanan
-                                </a>
-                            </div>
-                        </div>
+                    <h5 class="card-title" style="color: var(--text-primary);">Total Menu</h5>
+                    <h2 id="menuCount" class="mb-2" style="color: var(--primary);">{{ $menuCount ?? 0 }}</h2>
+                    <p class="text-muted small mb-0">Menu aktif di toko Anda</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card warning h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-clock fa-2x" style="color: var(--warning);"></i>
                     </div>
+                    <h5 class="card-title" style="color: var(--text-primary);">Pesanan Baru</h5>
+                    <h2 id="newOrders" class="mb-2" style="color: var(--warning);">{{ $newOrders ?? 0 }}</h2>
+                    <p class="text-muted small mb-0">Menunggu konfirmasi</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card success h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-money-bill-wave fa-2x" style="color: var(--success);"></i>
+                    </div>
+                    <h5 class="card-title" style="color: var(--text-primary);">Total Pendapatan</h5>
+                    <h2 id="totalRevenue" class="mb-2" style="color: var(--success);">Rp {{ number_format($totalRevenue ?? 0, 0, ',', '.') }}</h2>
+                    <p class="text-muted small mb-0">Dari pesanan selesai</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Pesanan Terbaru -->
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <span>Pesanan Terbaru</span>
-                            <a href="{{ route('penjual.orders.index') }}" class="btn btn-sm btn-outline-primary">
-                                Lihat Semua
-                            </a>
-                        </div>
+    <!-- Professional Quick Actions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0" style="color: var(--text-primary);">
+                <i class="fas fa-bolt me-2" style="color: var(--accent);"></i>
+                Aksi Cepat
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-wrap gap-3">
+                <a href="{{ route('penjual.menu.create') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Tambah Menu Baru
+                </a>
+                <a href="{{ route('penjual.orders.index') }}" class="btn btn-accent">
+                    <i class="fas fa-shopping-bag me-2"></i>Kelola Pesanan
+                </a>
+                <a href="{{ route('penjual.menu.index') }}" class="btn btn-secondary">
+                    <i class="fas fa-utensils me-2"></i>Daftar Menu
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Professional Recent Orders -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0" style="color: var(--text-primary);">
+                <i class="fas fa-history me-2" style="color: var(--accent);"></i>
+                Pesanan Terbaru
+            </h5>
+            <a href="{{ route('penjual.orders.index') }}" class="btn btn-sm btn-primary">
+                <i class="fas fa-arrow-right me-1"></i>Lihat Semua
+            </a>
+        </div>
                         <div class="card-body p-0">
                             @if(isset($recentOrders) && $recentOrders->count() > 0)
                                 <div class="table-responsive">
@@ -117,8 +142,8 @@
                                                     </td>
                                                     <td>
                                                         <a href="{{ route('penjual.orders.show', $order->id) }}" 
-                                                           class="btn btn-sm btn-outline-primary">
-                                                            Lihat
+                                                           class="btn btn-sm btn-primary">
+                                                            <i class="fas fa-eye me-1"></i>Lihat
                                                         </a>
                                                     </td>
                                                 </tr>
@@ -127,10 +152,34 @@
                                     </table>
                                 </div>
                             @else
-                                <div class="text-center py-4">
-                                    <p class="text-muted mb-0">Belum ada pesanan terbaru</p>
+                                <div class="text-center py-5">
+                                    <i class="fas fa-shopping-bag fa-4x text-muted mb-3"></i>
+                                    <h6 class="text-muted">Belum ada pesanan terbaru</h6>
+                                    <p class="text-muted small mb-0">Pesanan akan muncul di sini setelah pelanggan memesan</p>
                                 </div>
                             @endif
+                        </div>
+                    </div>
+
+    <!-- Professional Help Section -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card" style="border-left: 4px solid var(--accent);">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h6 class="mb-2" style="color: var(--text-primary);">
+                                <i class="fas fa-lightbulb me-2" style="color: var(--accent);"></i>
+                                Tips untuk Meningkatkan Penjualan
+                            </h6>
+                            <p class="mb-0 text-muted small">
+                                Pastikan foto menu menarik, deskripsi jelas, dan stok selalu tersedia untuk pengalaman pelanggan yang optimal.
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#helpModal">
+                                <i class="fas fa-question-circle me-1"></i>Panduan Lengkap
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -139,37 +188,88 @@
     </div>
 </div>
 
-<!-- Help Modal -->
+<!-- Professional Help Modal -->
 <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="helpModalLabel">Bantuan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header" style="background: linear-gradient(135deg, var(--primary), var(--accent)); color: white;">
+                <h5 class="modal-title" id="helpModalLabel">
+                    <i class="fas fa-graduation-cap me-2"></i>Panduan Seller NganTeen
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body">
-                <h6>Panduan Singkat</h6>
-                <ul class="list-unstyled">
-                    <li class="mb-2">
-                        <i class="fas fa-plus-circle text-primary me-2"></i>
-                        Gunakan tombol "Tambah Menu Baru" untuk menambahkan menu makanan/minuman
-                    </li>
-                    <li class="mb-2">
-                        <i class="fas fa-shopping-bag text-primary me-2"></i>
-                        Kelola pesanan masuk melalui halaman "Pesanan"
-                    </li>
-                    <li class="mb-2">
-                        <i class="fas fa-sync-alt text-primary me-2"></i>
-                        Gunakan tombol perbarui untuk memperbarui statistik
-                    </li>
-                </ul>
-                <div class="alert alert-info mt-3 mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Jika membutuhkan bantuan lebih lanjut, hubungi tim dukungan kami.
+            <div class="modal-body p-4">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3" style="color: var(--primary);">
+                            <i class="fas fa-rocket me-2"></i>Panduan Memulai
+                        </h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-plus-circle fa-lg me-3" style="color: var(--success);"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Tambah Menu</strong><br>
+                                        <small class="text-muted">Gunakan tombol "Tambah Menu Baru" untuk menambahkan produk dengan foto menarik</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-shopping-bag fa-lg me-3" style="color: var(--accent);"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Kelola Pesanan</strong><br>
+                                        <small class="text-muted">Monitor pesanan masuk dan update status secara real-time</small>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="mb-3">
+                                <div class="d-flex">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-chart-line fa-lg me-3" style="color: var(--warning);"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Analisis Penjualan</strong><br>
+                                        <small class="text-muted">Pantau statistik dan pendapatan melalui dashboard</small>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3" style="color: var(--primary);">
+                            <i class="fas fa-lightbulb me-2"></i>Tips Sukses
+                        </h6>
+                        <div class="alert alert-light border-start border-5" style="border-color: var(--accent) !important;">
+                            <small>
+                                <strong>Foto Berkualitas:</strong> Gunakan pencahayaan yang baik dan sudut menarik untuk foto menu<br><br>
+                                <strong>Deskripsi Jelas:</strong> Jelaskan bahan, rasa, dan keunikan menu secara detail<br><br>
+                                <strong>Stok Update:</strong> Selalu perbarui stok untuk menghindari kekecewaan pelanggan<br><br>
+                                <strong>Respon Cepat:</strong> Konfirmasi pesanan dengan cepat untuk kepuasan pelanggan
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 rounded" style="background-color: var(--background);">
+                    <div class="text-center">
+                        <i class="fas fa-info-circle fa-2x mb-2" style="color: var(--accent);"></i>
+                        <p class="mb-0 small text-muted">
+                            Butuh bantuan lebih lanjut? Hubungi tim support kami melalui WhatsApp atau email yang tersedia di footer
+                        </p>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Tutup
+                </button>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt me-1"></i>Hubungi Support
+                </button>
             </div>
         </div>
     </div>
