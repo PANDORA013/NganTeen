@@ -144,7 +144,17 @@ class OrderController extends Controller
             ->paginate(10)
             ->appends(request()->query());
 
-        return view('pembeli.orders.index', compact('orders'));
+        // Jika tidak ada riwayat pesanan, ambil menu-menu yang tersedia
+        $menus = collect();
+        if ($orders->isEmpty()) {
+            $menus = Menu::where('stok', '>', 0)
+                ->with(['user', 'ratings'])
+                ->latest()
+                ->take(12) // Ambil 12 menu terbaru
+                ->get();
+        }
+
+        return view('pembeli.riwayat', compact('orders', 'menus'));
     }
 
     /**

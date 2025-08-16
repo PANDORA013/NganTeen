@@ -8,21 +8,24 @@
     <title>Pembeli - {{ config('app.name', 'NganTeen') }}</title>
 
     <!-- Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Custom CSS -->
     <link href="{{ asset('css/pembeli.css') }}" rel="stylesheet">
     
     @stack('styles')
 </head>
-<body class="d-flex flex-column h-100 bg-light">
+<body class="d-flex flex-column h-100">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ route('pembeli.dashboard') }}">
                 <i class="fas fa-utensils me-2"></i>NganTeen
@@ -52,16 +55,15 @@
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item me-3">
-                        <a class="nav-link" href="{{ route('pembeli.cart.index') }}">
+                    <li class="nav-item me-3 position-relative">
+                        <a class="nav-link {{ request()->routeIs('pembeli.cart.*') ? 'active' : '' }}" 
+                           href="{{ route('pembeli.cart.index') }}">
                             <i class="fas fa-shopping-cart me-1"></i> Keranjang
                             @php
                                 $cartCount = \App\Models\Cart::where('user_id', auth()->id())->count();
                             @endphp
                             @if($cartCount > 0)
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    {{ $cartCount }}
-                                </span>
+                                <span class="badge rounded-pill bg-danger">{{ $cartCount }}</span>
                             @endif
                         </a>
                     </li>
@@ -91,41 +93,48 @@
     </nav>
 
     <!-- Page Content -->
-    <main class="flex-shrink-0 py-4">
-        <div class="container">
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <main class="flex-shrink-0">
+        @if(session('success'))
+            <div class="container mt-3">
+                <div class="alert alert-success alert-dismissible fade show menu-item" role="alert">
                     <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            @endif
+            </div>
+        @endif
 
-            @if($errors->any())
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @if($errors->any())
+            <div class="container mt-3">
+                <div class="alert alert-danger alert-dismissible fade show menu-item" role="alert">
                     <i class="fas fa-exclamation-circle me-2"></i> 
                     @foreach($errors->all() as $error)
                         {{ $error }}<br>
                     @endforeach
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-            @endif
+            </div>
+        @endif
 
-            @yield('content')
-        </div>
+        @yield('content')
     </main>
 
     <!-- Footer -->
-    <footer class="footer mt-auto py-3 bg-dark text-white">
+    <footer class="footer mt-auto">
         <div class="container">
-            <div class="row">
+            <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start">
-                    <span class="text-muted">© {{ date('Y') }} NganTeen. All rights reserved.</span>
+                    <div class="d-flex align-items-center justify-content-center justify-content-md-start mb-2 mb-md-0">
+                        <i class="fas fa-utensils me-2 text-primary"></i>
+                        <span class="fw-bold">NganTeen</span>
+                    </div>
+                    <small class="text-muted">© {{ date('Y') }} NganTeen. Semua hak dilindungi.</small>
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <div class="social-links">
-                        <a href="#" class="text-muted me-3"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-muted me-3"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-muted me-3"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
                     </div>
                 </div>
             </div>
@@ -133,33 +142,88 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Enable Bootstrap tooltips
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Bootstrap tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
             
-            // Update cart count in navbar
-            function updateCartCount() {
-                fetch('{{ route("pembeli.cart.count") }}')
-                    .then(response => response.json())
-                    .then(data => {
-                        const badge = document.querySelector('.cart-count');
-                        if (data.count > 0) {
-                            badge.textContent = data.count;
-                            badge.style.display = 'inline-block';
-                        } else {
-                            badge.style.display = 'none';
-                        }
-                    });
-            }
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                var alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    var bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
             
-            // Update cart count every 30 seconds
-            setInterval(updateCartCount, 30000);
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Add loading state to forms
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn && !submitBtn.disabled) {
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>' + submitBtn.textContent;
+                        submitBtn.disabled = true;
+                    }
+                });
+            });
         });
+        
+        // Global utility functions
+        function showToast(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container') || createToastContainer();
+            const toast = createToast(message, type);
+            toastContainer.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remove toast after it's hidden
+            toast.addEventListener('hidden.bs.toast', function() {
+                toast.remove();
+            });
+        }
+        
+        function createToastContainer() {
+            const container = document.createElement('div');
+            container.id = 'toast-container';
+            container.className = 'toast-container position-fixed top-0 end-0 p-3';
+            container.style.zIndex = '9999';
+            document.body.appendChild(container);
+            return container;
+        }
+        
+        function createToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.setAttribute('role', 'alert');
+            toast.innerHTML = `
+                <div class="toast-header">
+                    <i class="fas fa-${type === 'success' ? 'check-circle text-success' : 'exclamation-circle text-danger'} me-2"></i>
+                    <strong class="me-auto">NganTeen</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">${message}</div>
+            `;
+            return toast;
+        }
     </script>
     @stack('scripts')
 </body>

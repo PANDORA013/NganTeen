@@ -1,51 +1,75 @@
 <section>
-    <header>
-        <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Update Password') }}
-        </h2>
-
-        <p class="mt-1 text-sm text-gray-600">
-            {{ __('Ensure your account is using a long, random password to stay secure.') }}
+    <div class="mb-3">
+        <p class="text-muted">
+            <i class="fas fa-info-circle me-2"></i>
+            Pastikan akun Anda menggunakan password yang panjang dan acak untuk tetap aman.
         </p>
-    </header>
+    </div>
 
-    <form method="POST" action="{{ route('password.update') }}" class="mt-4">
+    <form method="POST" action="{{ route('password.update') }}">
         @csrf
         @method('PUT')
 
-        <div class="mb-3">
-            <label for="update_password_current_password" class="form-label">{{ __('Current Password') }}</label>
-            <input type="password" class="form-control @error('current_password', 'updatePassword') is-invalid @enderror" 
-                   id="update_password_current_password" name="current_password" required autocomplete="current-password">
-            @error('current_password', 'updatePassword')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+        <!-- Current Password -->
+        <div class="row mb-3">
+            <label for="update_password_current_password" class="col-sm-4 col-form-label">
+                <i class="fas fa-lock me-2"></i>Password Saat Ini
+            </label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control @error('current_password', 'updatePassword') is-invalid @enderror" 
+                       id="update_password_current_password" name="current_password" required autocomplete="current-password"
+                       placeholder="Masukkan password saat ini">
+                @error('current_password', 'updatePassword')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label for="update_password_password" class="form-label">{{ __('New Password') }}</label>
-            <input type="password" class="form-control @error('password', 'updatePassword') is-invalid @enderror" 
-                   id="update_password_password" name="password" required autocomplete="new-password">
-            @error('password', 'updatePassword')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
-            <label for="update_password_password_confirmation" class="form-label">{{ __('Confirm Password') }}</label>
-            <input type="password" class="form-control" 
-                   id="update_password_password_confirmation" name="password_confirmation" required autocomplete="new-password">
-        </div>
-
-        <div class="d-flex align-items-center gap-3">
-            <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
-            
-            @if (session('status') === 'password-updated')
-                <div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
-                    {{ __('Password berhasil diperbarui.') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <!-- New Password -->
+        <div class="row mb-3">
+            <label for="update_password_password" class="col-sm-4 col-form-label">
+                <i class="fas fa-key me-2"></i>Password Baru
+            </label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control @error('password', 'updatePassword') is-invalid @enderror" 
+                       id="update_password_password" name="password" required autocomplete="new-password"
+                       placeholder="Masukkan password baru">
+                @error('password', 'updatePassword')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+                <div class="form-text">
+                    <i class="fas fa-shield-alt me-1"></i>
+                    Minimal 8 karakter, kombinasi huruf dan angka
                 </div>
-            @endif
+            </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="row mb-4">
+            <label for="update_password_password_confirmation" class="col-sm-4 col-form-label">
+                <i class="fas fa-check-double me-2"></i>Konfirmasi Password
+            </label>
+            <div class="col-sm-8">
+                <input type="password" class="form-control" 
+                       id="update_password_password_confirmation" name="password_confirmation" required autocomplete="new-password"
+                       placeholder="Ketik ulang password baru">
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                @if (session('status') === 'password-updated')
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Password berhasil diperbarui!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg">
+                <i class="fas fa-save me-2"></i>Ubah Password
+            </button>
         </div>
     </form>
 </section>
