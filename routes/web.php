@@ -8,6 +8,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\MenuRatingController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,6 +16,14 @@ Route::get('/', function () {
 
 // Home route that will redirect based on role
 Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+// Dashboard route - generic redirect based on role
+Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
+    if (Auth::user()->role === 'penjual') {
+        return redirect()->route('penjual.dashboard');
+    }
+    return redirect()->route('pembeli.dashboard');
+})->name('dashboard');
 
 // Public menu routes - accessible to all
 Route::get('/menu', [MenuController::class, 'publicIndex'])->name('menu.index');
