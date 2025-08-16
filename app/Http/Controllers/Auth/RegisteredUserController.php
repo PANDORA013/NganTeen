@@ -52,9 +52,7 @@ class RegisteredUserController extends Controller
             Log::info('User berhasil registrasi', ['user_id' => $user->id]);
 
             // Redirect based on role to the proper named route
-            return redirect()->intended(
-                $user->isPenjual() ? route('penjual.dashboard') : route('pembeli.dashboard')
-            );
+            return redirect()->intended(route('dashboard'));
         } catch (\Exception $e) {
             Log::error('Error saat registrasi: ' . $e->getMessage(), [
                 'exception' => $e,
