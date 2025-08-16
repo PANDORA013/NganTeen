@@ -35,7 +35,23 @@
                         </div>
                         
                         <p class="mb-3">
-                            Sekali akun Anda dihapus, semua sumber daya dan data akan dihapus secara permanen. 
+                            <strong>⚠️ PERINGATAN PENTING:</strong><br>
+                            Sekali akun Anda dihapus, semua data berikut akan dihapus secara permanen:
+                        </p>
+                        
+                        <ul class="mb-3">
+                            <li>Informasi profil dan foto profil</li>
+                            <li>Riwayat pesanan dan transaksi</li>
+                            <li>Item dalam keranjang belanja</li>
+                            @if(auth()->user()->isPenjual())
+                            <li>Semua menu yang telah dibuat</li>
+                            <li>Gambar QRIS dan semua foto menu</li>
+                            @endif
+                            <li>Akses ke semua fitur aplikasi</li>
+                        </ul>
+                        
+                        <p class="mb-3 text-danger">
+                            <strong>Data yang telah dihapus TIDAK dapat dikembalikan!</strong><br>
                             Silakan masukkan password Anda untuk mengkonfirmasi bahwa Anda ingin menghapus akun secara permanen.
                         </p>
 

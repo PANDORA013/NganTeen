@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use Intervention\Image\ImageManagerStatic as Image;
 
@@ -145,13 +146,46 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        Auth::logout();
+        try {
+            // Clean up user-related files before deleting account
+            if ($user->profile_photo) {
+                Storage::disk('public')->delete($user->profile_photo);
+            }
+            
+            if ($user->qris_image) {
+                Storage::disk('public')->delete($user->qris_image);
+            }
 
-        $user->delete();
+            // Log the account deletion for audit purposes
+            Log::info('User account deleted', [
+                'user_id' => $user->id,
+                'user_email' => $user->email,
+                'user_role' => $user->role,
+                'deleted_at' => now(),
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent()
+            ]);
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+            // Logout the user first
+            Auth::logout();
 
-        return Redirect::to('/');
+            // Delete the user account
+            $user->delete();
+
+            // Invalidate and regenerate session for security
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return Redirect::to('/')->with('success', 'Akun Anda telah berhasil dihapus. Terima kasih telah menggunakan layanan kami.');
+            
+        } catch (\Exception $e) {
+            Log::error('Error during account deletion', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return back()->withErrors(['error' => 'Terjadi kesalahan saat menghapus akun. Silakan coba lagi.']);
+        }
     }
 }
