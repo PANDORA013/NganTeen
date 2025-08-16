@@ -48,12 +48,12 @@ class User extends Authenticatable
             // For pembeli (buyer), their orders can remain for seller records
             // but we can anonymize the buyer information if needed
             if ($user->isPembeli()) {
-                // Optionally anonymize orders instead of deleting them
-                // This preserves seller's order history while protecting user privacy
-                $user->orders()->update([
-                    'pembeli_email' => 'deleted_user@example.com',
-                    'pembeli_phone' => 'Akun telah dihapus'
-                ]);
+                // TODO: Fix orders table structure to support pembeli_id relationship
+                // For now, skip orders update until table structure is fixed
+                // $user->orders()->update([
+                //     'pembeli_email' => 'deleted_user@example.com',
+                //     'pembeli_phone' => 'Akun telah dihapus'
+                // ]);
             }
         });
     }

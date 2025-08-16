@@ -4,6 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Real-time notification meta tags -->
+    @auth
+        <meta name="user-id" content="{{ auth()->id() }}">
+        <meta name="user-role" content="{{ auth()->user()->role }}">
+    @endauth
+    
+    <meta name="current-area" content="{{ request()->get('area', 'Kampus A') }}">
 
     <title>{{ config('app.name', 'NganTeen') }}</title>
 

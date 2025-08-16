@@ -9,6 +9,19 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\MenuRatingController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Broadcast;
+
+// Broadcasting routes
+Broadcast::routes(['middleware' => ['auth']]);
+
+// Test broadcasting page
+Route::get('/test-broadcasting', function () {
+    return view('test-broadcasting');
+})->name('test.broadcasting');
+
+// API routes for testing broadcasting
+Route::post('/api/test/menu-broadcast', [App\Http\Controllers\Api\TestBroadcastController::class, 'testMenuBroadcast']);
+Route::post('/api/test/order-broadcast', [App\Http\Controllers\Api\TestBroadcastController::class, 'testOrderBroadcast']);
 
 Route::get('/', function () {
     return view('welcome');

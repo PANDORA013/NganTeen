@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\NewMenuAdded;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,17 @@ class Menu extends Model
     ];
 
     protected $appends = ['photo_url'];
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::created(function (Menu $menu) {
+            // Dispatch event when new menu is created
+            event(new NewMenuAdded($menu));
+        });
+    }
 
     /**
      * Get full photo URL

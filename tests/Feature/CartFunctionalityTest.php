@@ -80,7 +80,7 @@ class CartFunctionalityTest extends TestCase
                              'jumlah' => 3
                          ]);
 
-        $response->assertRedirect('/pembeli/cart');
+        $response->assertRedirect(route('pembeli.cart.index'));
         $this->assertEquals(3, $cartItem->fresh()->jumlah);
     }
 
@@ -101,7 +101,7 @@ class CartFunctionalityTest extends TestCase
         $response = $this->actingAs($user)
                          ->delete("/pembeli/cart/{$cartItem->id}");
 
-        $response->assertRedirect('/pembeli/cart');
+        $response->assertRedirect(route('pembeli.cart.index'));
         $this->assertDatabaseMissing('carts', ['id' => $cartItem->id]);
     }
 }

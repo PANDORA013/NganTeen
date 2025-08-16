@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Events\OrderStatusUpdated;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +20,25 @@ class Order extends Model {
         'delivery_address',
         'notes'
     ];
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::updating(function (Order $order) {
+            // Check if status is being changed
+            if ($order->isDirty('status')) {
+                $oldStatus = $order->getOriginal('status');
+                $newStatus = $order->status;
+                
+                // Dispatch the event after the model is saved
+                static::updated(function (Order $order) use ($oldStatus, $newStatus) {
+                    event(new OrderStatusUpdated($order, $oldStatus, $newStatus));
+                });
+            }
+        });
+    }
 
     /**
      * Relasi ke model User

@@ -87,19 +87,23 @@ class CartController extends Controller
     /**
      * Mengupdate jumlah item di keranjang
      *
-     * @param CartRequest $request
+     * @param Request $request
      * @param int $id
      * @return RedirectResponse
      */
-    public function update(CartRequest $request, int $id): RedirectResponse
+    public function update(Request $request, int $id): RedirectResponse
     {
         $cart = Cart::where('user_id', Auth::id())
             ->findOrFail($id);
 
+        $request->validate([
+            'jumlah' => 'required|integer|min:1|max:' . $cart->menu->stok,
+        ]);
+
         $cart->jumlah = $request->jumlah;
         $cart->save();
 
-        return redirect()->back()
+        return redirect()->route('pembeli.cart.index')
             ->with('success', 'Jumlah item berhasil diperbarui');
     }
 
@@ -116,7 +120,7 @@ class CartController extends Controller
 
         $cart->delete();
 
-        return redirect()->back()
+        return redirect()->route('pembeli.cart.index')
             ->with('success', 'Item berhasil dihapus dari keranjang');
     }
 
