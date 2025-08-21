@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Navigation Penjual - NganTeen</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fas fa-link me-2"></i>Test Navigation Penjual
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Click setiap link berikut untuk memastikan navigasi berfungsi dengan baik:
+                        </div>
+                        
+                        <div class="list-group">
+                            <a href="/penjual/dashboard" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-tachometer-alt me-2 text-primary"></i>
+                                    <strong>Dashboard</strong>
+                                    <br>
+                                    <small class="text-muted">Halaman utama penjual dengan statistik dan overview</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">Test</span>
+                            </a>
+                            
+                            <a href="/penjual/menu" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-utensils me-2 text-success"></i>
+                                    <strong>Kelola Menu</strong>
+                                    <br>
+                                    <small class="text-muted">Tambah, edit, dan kelola menu makanan/minuman</small>
+                                </div>
+                                <span class="badge bg-success rounded-pill">Test</span>
+                            </a>
+                            
+                            <a href="/penjual/orders" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-shopping-bag me-2 text-warning"></i>
+                                    <strong>Pesanan</strong>
+                                    <br>
+                                    <small class="text-muted">Kelola dan proses pesanan dari pelanggan</small>
+                                </div>
+                                <span class="badge bg-warning rounded-pill">Test</span>
+                            </a>
+                            
+                            <a href="/penjual/payouts" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-money-bill-wave me-2 text-info"></i>
+                                    <strong>Pencairan</strong>
+                                    <br>
+                                    <small class="text-muted">Kelola pencairan saldo dan riwayat pembayaran</small>
+                                </div>
+                                <span class="badge bg-info rounded-pill">Test</span>
+                            </a>
+                            
+                            <a href="/penjual/profile" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas fa-user-edit me-2 text-secondary"></i>
+                                    <strong>Profil</strong>
+                                    <br>
+                                    <small class="text-muted">Edit profil dan informasi warung</small>
+                                </div>
+                                <span class="badge bg-secondary rounded-pill">Test</span>
+                            </a>
+                        </div>
+                        
+                        <hr>
+                        
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="testAllLinks()">
+                                <i class="fas fa-check-circle me-2"></i>Test Semua Link Otomatis
+                            </button>
+                        </div>
+                        
+                        <div id="testResults" class="mt-3" style="display: none;">
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                <strong>Hasil Test:</strong>
+                                <ul id="resultsList" class="mb-0 mt-2">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function testAllLinks() {
+            const links = [
+                { url: '/penjual/dashboard', name: 'Dashboard' },
+                { url: '/penjual/menu', name: 'Kelola Menu' },
+                { url: '/penjual/orders', name: 'Pesanan' },
+                { url: '/penjual/payouts', name: 'Pencairan' },
+                { url: '/penjual/profile', name: 'Profil' }
+            ];
+
+            const resultsList = document.getElementById('resultsList');
+            const testResults = document.getElementById('testResults');
+            
+            resultsList.innerHTML = '';
+            testResults.style.display = 'block';
+
+            for (const link of links) {
+                try {
+                    const response = await fetch(link.url, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    const li = document.createElement('li');
+                    if (response.ok) {
+                        li.innerHTML = `<i class="fas fa-check text-success me-2"></i>${link.name} - <strong>OK</strong> (${response.status})`;
+                    } else {
+                        li.innerHTML = `<i class="fas fa-times text-danger me-2"></i>${link.name} - <strong>Error</strong> (${response.status})`;
+                    }
+                    resultsList.appendChild(li);
+                } catch (error) {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-exclamation-triangle text-warning me-2"></i>${link.name} - <strong>Network Error</strong>`;
+                    resultsList.appendChild(li);
+                }
+                
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+        }
+    </script>
+</body>
+</html>

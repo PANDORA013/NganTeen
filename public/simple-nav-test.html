@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Navigation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .nav-link { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            margin: 5px; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 5px;
+        }
+        .nav-link:hover { background: #0056b3; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Navigation Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>Direct Links Test</h2>
+        <p>Klik link di bawah untuk test navigasi:</p>
+        
+        <a href="/penjual/dashboard" class="nav-link">Dashboard</a>
+        <a href="/penjual/menu" class="nav-link">Kelola Menu</a>
+        <a href="/penjual/orders" class="nav-link">Pesanan</a>
+        <a href="/penjual/payouts" class="nav-link">Pencairan</a>
+    </div>
+    
+    <div class="test-section">
+        <h2>JavaScript Navigation Test</h2>
+        <button onclick="goTo('/penjual/dashboard')">Go to Dashboard</button>
+        <button onclick="goTo('/penjual/menu')">Go to Menu</button>
+        <button onclick="goTo('/penjual/orders')">Go to Orders</button>
+        <button onclick="goTo('/penjual/payouts')">Go to Payouts</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Route Status Check</h2>
+        <button onclick="checkRoutes()">Check All Routes</button>
+        <div id="routeStatus"></div>
+    </div>
+
+    <script>
+        function goTo(url) {
+            console.log('Navigating to:', url);
+            window.location.href = url;
+        }
+        
+        async function checkRoutes() {
+            const routes = [
+                '/penjual/dashboard',
+                '/penjual/menu', 
+                '/penjual/orders',
+                '/penjual/payouts'
+            ];
+            
+            const statusDiv = document.getElementById('routeStatus');
+            statusDiv.innerHTML = '<h3>Checking routes...</h3>';
+            
+            for (const route of routes) {
+                try {
+                    const response = await fetch(route, { method: 'HEAD' });
+                    const status = response.status;
+                    const statusText = response.ok ? '✅ OK' : '❌ ERROR';
+                    statusDiv.innerHTML += `<p>${route}: ${statusText} (${status})</p>`;
+                } catch (error) {
+                    statusDiv.innerHTML += `<p>${route}: ❌ NETWORK ERROR</p>`;
+                }
+            }
+        }
+    </script>
+</body>
+</html>

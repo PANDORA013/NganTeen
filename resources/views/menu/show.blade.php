@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.pembeli')
 
 @section('content')
 <div class="container py-4 py-lg-5">
@@ -7,7 +7,7 @@
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="mb-4">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('menu.index') }}">Menu</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('pembeli.menu.index') }}">Menu</a></li>
                     <li class="breadcrumb-item active" aria-current="page">{{ $menu->nama_menu }}</li>
                 </ol>
             </nav>
@@ -120,7 +120,7 @@
                                 @foreach($menu->recommendedMenus as $recommended)
                                     <div class="col-md-6 col-lg-4">
                                         <div class="card h-100 border-0 shadow-sm">
-                                            <a href="{{ route('menu.show', $recommended->id) }}" class="text-decoration-none">
+                                            <a href="{{ route('pembeli.menu.show', $recommended->id) }}" class="text-decoration-none">
                                                 @if($recommended->image)
                                                     <img src="{{ asset('storage/'.$recommended->image) }}" class="card-img-top" style="height: 180px; object-fit: cover;" alt="{{ $recommended->nama_menu }}">
                                                 @else
@@ -147,56 +147,71 @@
                     @endif
                     
                     <!-- Reviews Section -->
+                    <!-- Rating & Reviews Section -->
                     <div class="mt-5 pt-4 border-top">
-                        <h4 class="h4 fw-bold mb-4"><i class="fas fa-comments text-primary me-2"></i>Ulasan Pelanggan</h4>
+                        <h4 class="h4 fw-bold mb-4">
+                            <i class="fas fa-comments text-primary me-2"></i>Rating & Ulasan
+                        </h4>
                         
-                        @auth
-                            <div class="card mb-4 border-0 shadow-sm">
-                                <div class="card-body">
-                                    <h5 class="h5 mb-3">Tulis Ulasan Anda</h5>
-                                    <form action="{{ route('menu.rating.store', $menu->id) }}" method="POST" id="reviewForm">
-                                        @csrf
-                                        <div class="mb-3">
-                                            <label class="form-label fw-bold">Rating</label>
-                                            <div class="rating-input">
-                                                @for($i = 5; $i >= 1; $i--)
-                                                    <input type="radio" id="star{{ $i }}" name="rating" value="{{ $i }}" {{ old('rating') == $i ? 'checked' : '' }}>
-                                                    <label for="star{{ $i }}" class="star-label"><i class="fas fa-star"></i></label>
-                                                @endfor
-                                            </div>
-                                        </div>
-                                        <div class="mb-3">
-                                            <textarea name="review" class="form-control" rows="3" placeholder="Bagikan pengalaman Anda..." required></textarea>
-                                        </div>
-                                        <button type="submit" class="btn btn-primary px-4" id="submitReviewBtn">
-                                            <span class="submit-text">Kirim Ulasan</span>
-                                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                                        </button>
-                                    </form>
-                                </div>
-                            </div>
-                        @endauth
+                        <!-- Interactive Rating Component -->
+                        @php
+                            $userRating = null;
+                            if(auth()->check()) {
+                                $userRating = $menu->ratings()->where('user_id', auth()->id())->first();
+                            }
+                        @endphp
                         
-                        <div class="reviews-list">
-                            @forelse($menu->ratings as $rating)
+                        <x-rating-system 
+                            :menu="$menu" 
+                            :user-rating="$userRating" 
+                            :readonly="false" 
+                        />
+                        
+                        <!-- Reviews List -->
+                        <div class="reviews-list mt-4">
+                            <h5 class="h5 mb-3">Semua Ulasan</h5>
+                            @forelse($menu->ratings()->with('user')->orderBy('created_at', 'desc')->get() as $rating)
                                 <div class="card mb-3 border-0 shadow-sm">
                                     <div class="card-body">
-                                        <div class="d-flex justify-content-between mb-2">
-                                            <h6 class="card-title fw-bold mb-0">{{ $rating->user->name }}</h6>
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" 
+                                                     style="width: 40px; height: 40px;">
+                                                    {{ strtoupper(substr($rating->user->name, 0, 1)) }}
+                                                </div>
+                                                <div>
+                                                    <h6 class="mb-0 fw-bold">{{ $rating->user->name }}</h6>
+                                                    <small class="text-muted">{{ $rating->created_at->diffForHumans() }}</small>
+                                                </div>
+                                            </div>
                                             <div class="text-warning">
                                                 @for($i = 1; $i <= 5; $i++)
                                                     <i class="fas fa-star {{ $i <= $rating->rating ? 'text-warning' : 'text-light' }}"></i>
                                                 @endfor
+                                                <span class="ms-1 text-muted small">{{ $rating->rating }}/5</span>
                                             </div>
                                         </div>
-                                        <p class="card-text mb-2">{{ $rating->review }}</p>
-                                        <small class="text-muted">{{ $rating->created_at->diffForHumans() }}</small>
+                                        
+                                        @if($rating->review)
+                                            <p class="card-text mb-0">{{ $rating->review }}</p>
+                                        @else
+                                            <p class="card-text text-muted fst-italic mb-0">Tidak ada komentar</p>
+                                        @endif
+                                        
+                                        @if(auth()->check() && auth()->id() === $rating->user_id)
+                                            <div class="mt-2">
+                                                <small class="text-success">
+                                                    <i class="fas fa-check me-1"></i>Ulasan Anda
+                                                </small>
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             @empty
-                                <div class="text-center py-4">
-                                    <i class="fas fa-comment-slash fa-2x text-muted mb-3"></i>
-                                    <p class="text-muted">Belum ada ulasan untuk menu ini</p>
+                                <div class="text-center py-5">
+                                    <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+                                    <h5 class="text-muted">Belum Ada Ulasan</h5>
+                                    <p class="text-muted">Jadilah yang pertama memberikan ulasan untuk menu ini!</p>
                                 </div>
                             @endforelse
                         </div>
@@ -206,7 +221,7 @@
             
             <!-- Back Button -->
             <div class="mt-4 text-center">
-                <a href="{{ route('menu.index') }}" class="btn btn-outline-primary px-4">
+                <a href="{{ route('pembeli.menu.index') }}" class="btn btn-outline-primary px-4">
                     <i class="fas fa-arrow-left me-2"></i>Kembali ke Daftar Menu
                 </a>
             </div>

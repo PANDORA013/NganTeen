@@ -13,6 +13,8 @@ class Cart extends Model
 
     /**
      * Get the user that owns the cart item.
+     * 
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -21,6 +23,8 @@ class Cart extends Model
 
     /**
      * Get the menu associated with the cart item.
+     * 
+     * @return BelongsTo<Menu, $this>
      */
     public function menu(): BelongsTo
     {

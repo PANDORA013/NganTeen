@@ -43,6 +43,9 @@ class RegisteredUserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
                 'role' => $request->role,
+                'registration_date' => now(),
+                'last_activity' => now(),
+                'last_login_at' => now(),
             ]);
 
             event(new Registered($user));
@@ -52,7 +55,13 @@ class RegisteredUserController extends Controller
             Log::info('User berhasil registrasi', ['user_id' => $user->id]);
 
             // Redirect based on role to the proper named route
-            return redirect()->intended(route('dashboard'));
+            if ($user->role === 'admin') {
+                return redirect()->intended(route('admin.dashboard'));
+            } elseif ($user->role === 'penjual') {
+                return redirect()->intended(route('penjual.dashboard'));
+            } else {
+                return redirect()->intended(route('pembeli.dashboard'));
+            }
         } catch (\Exception $e) {
             Log::error('Error saat registrasi: ' . $e->getMessage(), [
                 'exception' => $e,

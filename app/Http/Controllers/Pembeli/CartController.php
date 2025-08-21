@@ -42,7 +42,10 @@ class CartController extends Controller
             return $item->menu->harga * $item->jumlah;
         });
 
-        return view('pembeli.keranjang', compact('keranjang', 'total'));
+        // Total quantity semua item
+        $totalQuantity = $keranjang->sum('jumlah');
+
+        return view('pembeli.keranjang', compact('keranjang', 'total', 'totalQuantity'));
     }
 
     /**
@@ -131,7 +134,14 @@ class CartController extends Controller
      */
     public function count(): JsonResponse
     {
-        $count = Cart::where('user_id', Auth::id())->sum('jumlah');
-        return response()->json(['count' => $count]);
+        $keranjang = Cart::where('user_id', Auth::id())->get();
+        $totalQuantity = $keranjang->sum('jumlah');
+        $menuCount = $keranjang->count();
+        
+        return response()->json([
+            'count' => $totalQuantity,
+            'menu_count' => $menuCount,
+            'total_items' => $totalQuantity
+        ]);
     }
 }

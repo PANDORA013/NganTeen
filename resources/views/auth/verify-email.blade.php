@@ -1,31 +1,56 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn\'t receive the email, we will gladly send you another.') }}
+    <!-- Auth Header -->
+    <div class="auth-header">
+        <div class="auth-logo">
+            <i class="fas fa-envelope-open"></i>
+        </div>
+        <h1 class="auth-title">Verifikasi Email</h1>
+        <p class="auth-subtitle">Kami telah mengirim link verifikasi ke email Anda</p>
     </div>
 
-    @if (session('status') == 'verification-link-sent')
-        <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+    <!-- Auth Body -->
+    <div class="auth-body">
+        <div class="text-center mb-4">
+            <p class="text-muted">
+                Terima kasih telah mendaftar! Sebelum memulai, mohon verifikasi alamat email Anda 
+                dengan mengklik link yang telah kami kirimkan. Jika Anda tidak menerima email, 
+                kami akan dengan senang hati mengirimkan ulang.
+            </p>
         </div>
-    @endif
 
-    <div class="mt-4 flex items-center justify-between">
-        <form method="POST" action="{{ route('verification.send') }}">
-            @csrf
-
-            <div>
-                <x-primary-button>
-                    {{ __('Resend Verification Email') }}
-                </x-primary-button>
+        @if (session('status') == 'verification-link-sent')
+            <div class="alert-auth alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                Link verifikasi baru telah dikirim ke alamat email yang Anda berikan saat registrasi.
             </div>
-        </form>
+        @endif
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
+        <div class="d-flex flex-column gap-3">
+            <!-- Resend Verification Email -->
+            <form method="POST" action="{{ route('verification.send') }}">
+                @csrf
+                <button type="submit" class="btn-auth-primary">
+                    <i class="fas fa-redo me-2"></i>
+                    Kirim Ulang Email Verifikasi
+                </button>
+            </form>
 
-            <button type="submit" class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                {{ __('Log Out') }}
-            </button>
-        </form>
+            <!-- Logout -->
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-sign-out-alt me-2"></i>
+                    Keluar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Auth Footer -->
+    <div class="auth-footer">
+        <p>
+            <i class="fas fa-question-circle me-1"></i>
+            Periksa folder spam/junk jika tidak menemukan email kami
+        </p>
     </div>
 </x-guest-layout>

@@ -8,7 +8,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Edit Menu</h5>
                     <a href="{{ route('penjual.menu.index') }}" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-arrow-left"></i> Kembali
+                        <i class="bi bi-arrow-left"></i> Kembali ke Kelola Menu
                     </a>
                 </div>
 
@@ -91,7 +91,8 @@
                             @if($menu->gambar)
                                 <div class="mb-2">
                                     <img src="{{ Storage::url($menu->gambar) }}" alt="{{ $menu->nama_menu }}" 
-                                         class="img-thumbnail" style="max-height: 150px;">
+                                         class="img-thumbnail" 
+                                         style="max-height: 200px; max-width: 100%; object-fit: cover; border-radius: 8px;">
                                 </div>
                             @endif
                             <input type="file" class="form-control" id="gambar" name="gambar" accept="image/*">
@@ -112,4 +113,26 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle form submission to convert formatted numbers
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function() {
+            const priceInputs = form.querySelectorAll('input[name="harga"], input[name*="price"]');
+            priceInputs.forEach(input => {
+                if (input.value) {
+                    // Remove formatting (convert 10.000 to 10000)
+                    input.value = input.value.replace(/\./g, '');
+                    console.log('Edit form submission - converted price:', input.value);
+                }
+            });
+        });
+    }
+});
+</script>
+@endpush
+
 @endsection

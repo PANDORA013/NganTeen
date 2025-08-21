@@ -43,7 +43,7 @@
                                 <i class="fas fa-{{ $statusConfig['icon'] }} me-1"></i>{{ $statusConfig['text'] }}
                             </span>
                             @if($order->canBeCancelled())
-                                <form action="{{ route('order.cancel', $order) }}" method="POST" class="d-inline cancel-form">
+                                <form action="{{ route('pembeli.orders.cancel', $order) }}" method="POST" class="d-inline cancel-form">
                                     @csrf
                                     <button type="submit" 
                                             class="btn btn-outline-danger btn-sm"
@@ -161,7 +161,7 @@
                         <h3 class="h5 fw-bold mb-0">
                             <i class="fas fa-utensils me-2"></i>Menu Terbaru Yang Tersedia
                         </h3>
-                        <a href="{{ route('menu.index') }}" class="btn btn-outline-primary btn-sm">
+                        <a href="{{ route('pembeli.menu.index') }}" class="btn btn-outline-primary btn-sm">
                             <i class="fas fa-eye me-1"></i>Lihat Semua
                         </a>
                     </div>

@@ -1,56 +1,112 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form method="POST" action="{{ route('login') }}">
-        @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    <!-- Auth Header -->
+    <div class="auth-header">
+        <div class="auth-logo">
+            <i class="fas fa-utensils"></i>
         </div>
+        <h1 class="auth-title">Selamat Datang Kembali</h1>
+        <p class="auth-subtitle">Masuk ke akun NganTeen Anda untuk melanjutkan</p>
+    </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+    <!-- Auth Body -->
+    <div class="auth-body">
+        <!-- Session Status -->
+        @if (session('status'))
+            <div class="alert-auth alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('status') }}
+            </div>
+        @endif
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+        <form method="POST" action="{{ route('login') }}" class="auth-form">
+            @csrf
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+            <!-- Email Address -->
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <i class="fas fa-envelope"></i>
+                    Alamat Email
+                </label>
+                <input 
+                    id="email" 
+                    type="email" 
+                    class="form-control @error('email') is-invalid @enderror" 
+                    name="email" 
+                    value="{{ old('email') }}" 
+                    required 
+                    autofocus 
+                    autocomplete="username"
+                    placeholder="Masukkan alamat email Anda"
+                />
+                @error('email')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i>
+                    Kata Sandi
+                </label>
+                <input 
+                    id="password" 
+                    type="password" 
+                    class="form-control @error('password') is-invalid @enderror" 
+                    name="password" 
+                    required 
+                    autocomplete="current-password"
+                    placeholder="Masukkan kata sandi Anda"
+                />
+                @error('password')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
+            <!-- Remember Me -->
+            <div class="form-check">
+                <input 
+                    id="remember_me" 
+                    type="checkbox" 
+                    class="form-check-input" 
+                    name="remember"
+                />
+                <label for="remember_me" class="form-check-label">
+                    Ingat saya
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-auth-primary">
+                <i class="fas fa-sign-in-alt me-2"></i>
+                Masuk ke Akun
+            </button>
+
+            <!-- Forgot Password Link -->
             @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
+                <div class="text-center mt-3">
+                    <a href="{{ route('password.request') }}" class="auth-link">
+                        <i class="fas fa-key me-1"></i>
+                        Lupa kata sandi?
+                    </a>
+                </div>
             @endif
+        </form>
+    </div>
 
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-
-    <!-- Register Link -->
-    <div class="mt-4 text-center">
-        <p class="text-sm text-gray-600">
-            Belum punya akun?
-            <a href="{{ route('register') }}" class="text-blue-500 hover:text-blue-700 hover:underline font-semibold">
-                Daftar di sini
+    <!-- Auth Footer -->
+    <div class="auth-footer">
+        <p>
+            Belum punya akun? 
+            <a href="{{ route('register') }}" class="auth-link">
+                <i class="fas fa-user-plus me-1"></i>
+                Daftar sekarang
             </a>
         </p>
     </div>

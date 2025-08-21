@@ -1,25 +1,66 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
+    <!-- Auth Header -->
+    <div class="auth-header">
+        <div class="auth-logo">
+            <i class="fas fa-key"></i>
+        </div>
+        <h1 class="auth-title">Lupa Kata Sandi?</h1>
+        <p class="auth-subtitle">Jangan khawatir, kami akan mengirimkan link reset ke email Anda</p>
     </div>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <!-- Auth Body -->
+    <div class="auth-body">
+        <!-- Session Status -->
+        @if (session('status'))
+            <div class="alert-auth alert-success">
+                <i class="fas fa-check-circle me-2"></i>
+                {{ session('status') }}
+            </div>
+        @endif
 
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
+        <form method="POST" action="{{ route('password.email') }}" class="auth-form">
+            @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+            <!-- Email Address -->
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <i class="fas fa-envelope"></i>
+                    Alamat Email
+                </label>
+                <input 
+                    id="email" 
+                    type="email" 
+                    class="form-control @error('email') is-invalid @enderror" 
+                    name="email" 
+                    value="{{ old('email') }}" 
+                    required 
+                    autofocus
+                    placeholder="Masukkan alamat email akun Anda"
+                />
+                @error('email')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
-    </form>
+            <!-- Submit Button -->
+            <button type="submit" class="btn-auth-primary">
+                <i class="fas fa-paper-plane me-2"></i>
+                Kirim Link Reset Password
+            </button>
+        </form>
+    </div>
+
+    <!-- Auth Footer -->
+    <div class="auth-footer">
+        <p>
+            Ingat kata sandi Anda? 
+            <a href="{{ route('login') }}" class="auth-link">
+                <i class="fas fa-sign-in-alt me-1"></i>
+                Kembali ke login
+            </a>
+        </p>
+    </div>
 </x-guest-layout>

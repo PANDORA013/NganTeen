@@ -43,7 +43,7 @@ class Order extends Model {
     /**
      * Relasi ke model User
      * 
-     * @return BelongsTo
+     * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
     {
@@ -53,7 +53,7 @@ class Order extends Model {
     /**
      * Relasi ke model OrderItem
      * 
-     * @return HasMany
+     * @return HasMany<OrderItem, $this>
      */
     public function orderItems(): HasMany
     {

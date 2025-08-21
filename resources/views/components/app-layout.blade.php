@@ -74,23 +74,23 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('penjual.menu.index') }}">
+                                <a class="nav-link" href="{{ route('penjual.dashboard') }}">
                                     {{ __('Menu Saya') }}
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('penjual.orders.index') }}">
+                                <a class="nav-link" href="{{ route('penjual.orders') }}">
                                     {{ __('Pesanan') }}
                                 </a>
                             </li>
                         @else
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('menu.index') }}">
+                                <a class="nav-link" href="{{ route('pembeli.menu.index') }}">
                                     {{ __('Menu') }}
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('pembeli.riwayat') }}">
+                                <a class="nav-link" href="{{ route('pembeli.orders.index') }}">
                                     {{ __('Riwayat Pesanan') }}
                                 </a>
                             </li>

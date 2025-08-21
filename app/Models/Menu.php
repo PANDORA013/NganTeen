@@ -13,63 +13,98 @@ use Illuminate\Support\Facades\Storage;
 class Menu extends Model
 {
     use HasFactory;
+    
     protected $fillable = [
-        'user_id', 'nama_menu', 'harga', 'stok', 'area_kampus', 'nama_warung', 'gambar',
+        'user_id', 
+        'nama_menu', 
+        'harga', 
+        'stok', 
+        'area_kampus', 
+        'kategori', 
+        'deskripsi', 
+        'nama_warung', 
+        'gambar',
     ];
 
     protected $appends = ['photo_url'];
 
+    protected function casts(): array
+    {
+        return [
+            'harga' => 'integer',
+            'stok' => 'integer',
+        ];
+    }
+
     /**
-     * The "booted" method of the model.
+     * Boot model events
      */
     protected static function booted(): void
     {
         static::created(function (Menu $menu) {
-            // Dispatch event when new menu is created
             event(new NewMenuAdded($menu));
         });
     }
 
     /**
      * Get full photo URL
-     * 
-     * @return string|null
      */
     public function getPhotoUrlAttribute(): ?string
     {
         return $this->gambar ? Storage::url($this->gambar) : null;
     }
 
+    // Relationships
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany<OrderItem, $this>
+     */
     public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function orders()
-    {
-        return $this->hasManyThrough(Order::class, OrderItem::class, 'menu_id', 'id', 'id', 'order_id');
-    }
-
+    /**
+     * @return HasMany<MenuRating, $this>
+     */
     public function ratings(): HasMany
     {
         return $this->hasMany(MenuRating::class);
     }
 
+    /**
+     * @return BelongsToMany<User, $this>
+     */
     public function favoritedBy(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_favorites', 'menu_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(User::class, 'user_favorites', 'menu_id', 'user_id')
+               ->withTimestamps();
     }
 
-    public function recommendedMenus(): BelongsToMany
+    /**
+     * @return HasMany<GlobalOrderItem, $this>
+     */
+    public function globalOrderItems(): HasMany
     {
-        return $this->belongsToMany(Menu::class, 'menu_recommendations', 'menu_id', 'recommended_id');
+        return $this->hasMany(GlobalOrderItem::class);
     }
 
+    /**
+     * @return BelongsTo<Warung, $this>
+     */
+    public function warung(): BelongsTo
+    {
+        return $this->belongsTo(Warung::class, 'user_id', 'user_id');
+    }
+
+    // Helper methods
     public function averageRating(): float
     {
         return $this->ratings()->avg('rating') ?? 0;

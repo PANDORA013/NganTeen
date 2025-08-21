@@ -6,9 +6,9 @@
         </p>
     </div>
 
-    <form method="POST" action="{{ route('password.update') }}">
+    <form method="POST" action="{{ route('profile.password.update') }}">
         @csrf
-        @method('PUT')
+        @method('PATCH')
 
         <!-- Current Password -->
         <div class="row mb-3">
@@ -32,14 +32,23 @@
             </label>
             <div class="col-sm-8">
                 <input type="password" class="form-control @error('password', 'updatePassword') is-invalid @enderror" 
-                       id="update_password_password" name="password" required autocomplete="new-password"
+                       id="password" name="password" required autocomplete="new-password"
                        placeholder="Masukkan password baru">
                 @error('password', 'updatePassword')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
+                
+                <!-- Password Strength Indicator -->
+                <div class="mt-2">
+                    <div class="progress" style="height: 6px;">
+                        <div class="progress-bar bg-danger" id="password-strength" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted" id="strength-text">Kekuatan password</small>
+                </div>
+                
                 <div class="form-text">
                     <i class="fas fa-shield-alt me-1"></i>
-                    Minimal 8 karakter, kombinasi huruf dan angka
+                    Minimal 8 karakter, kombinasi huruf besar/kecil, angka, dan simbol
                 </div>
             </div>
         </div>

@@ -80,15 +80,17 @@
                         </div>
                         
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <div class="rating">
+                            <div class="rating-display">
+                                @php
+                                    $avgRating = $menu->averageRating();
+                                    $totalRatings = $menu->ratings->count();
+                                @endphp
                                 @for($i = 1; $i <= 5; $i++)
-                                    @if($i <= $menu->rating)
-                                        <i class="fas fa-star text-warning"></i>
-                                    @else
-                                        <i class="far fa-star text-muted"></i>
-                                    @endif
+                                    <i class="fa{{ $i <= floor($avgRating) ? 's' : 'r' }} fa-star text-warning"></i>
                                 @endfor
-                                <span class="small ms-1 text-muted">({{ $menu->rating }})</span>
+                                <span class="small ms-1 text-muted">
+                                    {{ number_format($avgRating, 1) }} ({{ $totalRatings }})
+                                </span>
                             </div>
                             <div class="menu-price">
                                 Rp {{ number_format($menu->harga, 0, ',', '.') }}
@@ -169,8 +171,8 @@
 
 @push('styles')
 <style>
-.rating .fas.fa-star,
-.rating .far.fa-star {
+.rating-display .fas.fa-star,
+.rating-display .far.fa-star {
     font-size: 0.875rem;
 }
 

@@ -1,27 +1,55 @@
 <x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600">
-        {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}
+    <!-- Auth Header -->
+    <div class="auth-header">
+        <div class="auth-logo">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h1 class="auth-title">Konfirmasi Kata Sandi</h1>
+        <p class="auth-subtitle">Ini adalah area aman. Silakan konfirmasi kata sandi Anda untuk melanjutkan</p>
     </div>
 
-    <form method="POST" action="{{ route('password.confirm') }}">
-        @csrf
+    <!-- Auth Body -->
+    <div class="auth-body">
+        <form method="POST" action="{{ route('password.confirm') }}" class="auth-form">
+            @csrf
 
-        <!-- Password -->
-        <div>
-            <x-input-label for="password" :value="__('Password')" />
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i>
+                    Kata Sandi
+                </label>
+                <input 
+                    id="password" 
+                    type="password" 
+                    class="form-control @error('password') is-invalid @enderror" 
+                    name="password" 
+                    required 
+                    autocomplete="current-password"
+                    placeholder="Masukkan kata sandi Anda"
+                    autofocus
+                />
+                @error('password')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+            <!-- Submit Button -->
+            <button type="submit" class="btn-auth-primary">
+                <i class="fas fa-check me-2"></i>
+                Konfirmasi
+            </button>
+        </form>
+    </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <div class="flex justify-end mt-4">
-            <x-primary-button>
-                {{ __('Confirm') }}
-            </x-primary-button>
-        </div>
-    </form>
+    <!-- Auth Footer -->
+    <div class="auth-footer">
+        <p>
+            <i class="fas fa-info-circle me-1"></i>
+            Untuk keamanan, kami perlu memverifikasi identitas Anda
+        </p>
+    </div>
 </x-guest-layout>

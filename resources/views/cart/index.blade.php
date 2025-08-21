@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.pembeli')
 
 @section('content')
 <div class="container-fluid px-0">
@@ -81,7 +81,7 @@
                                 <span class="text-primary">Rp {{ number_format($subtotal + 2000, 0, ',', '.') }}</span>
                             </div>
                             
-                            <a href="{{ route('checkout') }}" class="btn btn-primary w-100 py-3">
+                            <a href="{{ route('global.checkout') }}" class="btn btn-primary w-100 py-3">
                                 Lanjut ke Pembayaran
                             </a>
                         </div>
@@ -93,7 +93,7 @@
                 <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
                 <h4 class="fw-bold mb-3">Keranjang Anda Kosong</h4>
                 <p class="text-muted mb-4">Tambahkan beberapa menu untuk memulai pesanan</p>
-                <a href="{{ route('menu.index') }}" class="btn btn-primary px-4">
+                <a href="{{ route('pembeli.menu.index') }}" class="btn btn-primary px-4">
                     <i class="fas fa-utensils me-2"></i> Lihat Menu
                 </a>
             </div>

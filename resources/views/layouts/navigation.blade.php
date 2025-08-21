@@ -20,10 +20,10 @@
                     </x-nav-link>
 
                     @if(auth()->user()->isPenjual())
-                        <x-nav-link :href="route('penjual.menu.index')" :active="request()->routeIs('penjual.menu.*')">
+                        <x-nav-link :href="route('penjual.dashboard')" :active="request()->routeIs('penjual.menu.*')">
                             {{ __('Kelola Menu') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('penjual.orders.index')" :active="request()->routeIs('penjual.orders.*')">
+                        <x-nav-link :href="route('penjual.orders')" :active="request()->routeIs('penjual.orders.*')">
                             {{ __('Pesanan') }}
                         </x-nav-link>
                     @else
@@ -53,14 +53,26 @@
 
                     <x-slot name="content">
                         <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                            <i class="fas fa-user me-2"></i>{{ __('Profile') }}
                         </x-dropdown-link>
+                        
+                        <x-dropdown-link :href="route('profile.password.edit')">
+                            <i class="fas fa-key me-2"></i>{{ __('Ubah Password') }}
+                        </x-dropdown-link>
+                        
+                        @if(auth()->user()->isPenjual())
+                            <x-dropdown-link :href="route('profile.qris.edit')">
+                                <i class="fas fa-qrcode me-2"></i>{{ __('Kelola QRIS') }}
+                            </x-dropdown-link>
+                        @endif
+
+                        <hr class="my-1">
 
                         <!-- Logout -->
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                                <i class="fas fa-sign-out-alt me-2"></i>{{ __('Log Out') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
@@ -92,10 +104,10 @@
             </x-responsive-nav-link>
 
             @if(auth()->user()->isPenjual())
-                <x-responsive-nav-link :href="route('penjual.menu.index')" :active="request()->routeIs('penjual.menu.*')">
+                <x-responsive-nav-link :href="route('penjual.dashboard')" :active="request()->routeIs('penjual.menu.*')">
                     {{ __('Kelola Menu') }}
                 </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('penjual.orders.index')" :active="request()->routeIs('penjual.orders.*')">
+                <x-responsive-nav-link :href="route('penjual.orders')" :active="request()->routeIs('penjual.orders.*')">
                     {{ __('Pesanan') }}
                 </x-responsive-nav-link>
             @else
@@ -117,8 +129,18 @@
 
             <div class="mt-3 space-y-1">
                 <x-responsive-nav-link :href="route('profile.edit')">
-                    {{ __('Profile') }}
+                    <i class="fas fa-user me-2"></i>{{ __('Profile') }}
                 </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('profile.password.edit')">
+                    <i class="fas fa-key me-2"></i>{{ __('Ubah Password') }}
+                </x-responsive-nav-link>
+                
+                @if(auth()->user()->isPenjual())
+                    <x-responsive-nav-link :href="route('profile.qris.edit')">
+                        <i class="fas fa-qrcode me-2"></i>{{ __('Kelola QRIS') }}
+                    </x-responsive-nav-link>
+                @endif
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

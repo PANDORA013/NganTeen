@@ -22,15 +22,48 @@
     <link href="{{ asset('css/pembeli.css') }}" rel="stylesheet">
     
     @stack('styles')
+    
+    <style>
+        .sr-only {
+            position: absolute !important;
+            width: 1px !important;
+            height: 1px !important;
+            padding: 0 !important;
+            margin: -1px !important;
+            overflow: hidden !important;
+            clip: rect(0, 0, 0, 0) !important;
+            white-space: nowrap !important;
+            border: 0 !important;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: #000;
+            color: #fff;
+            padding: 8px;
+            text-decoration: none;
+            z-index: 1000;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+    </style>
 </head>
 <body class="d-flex flex-column h-100">
+    <!-- Skip to main content link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
             <a class="navbar-brand fw-bold" href="{{ route('pembeli.dashboard') }}">
                 <i class="fas fa-utensils me-2"></i>NganTeen
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -42,8 +75,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('menu.*') ? 'active' : '' }}" 
-                           href="{{ route('menu.index') }}">
+                        <a class="nav-link {{ request()->routeIs('pembeli.menu.*') ? 'active' : '' }}" 
+                           href="{{ route('pembeli.menu.index') }}">
                             <i class="fas fa-utensils me-1"></i> Menu
                         </a>
                     </li>
@@ -93,7 +126,7 @@
     </nav>
 
     <!-- Page Content -->
-    <main class="flex-shrink-0">
+    <main id="main-content" class="flex-shrink-0" role="main">
         @if(session('success'))
             <div class="container mt-3">
                 <div class="alert alert-success alert-dismissible fade show menu-item" role="alert">
@@ -145,11 +178,61 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize modals with error handling
+            initializeModals();
+            
+            // Initialize number formatting
+            initializeNumberFormatting();
+            
+            // Setup form submission handlers
+            setupFormSubmissionHandlers();
+        });
+        
+        function initializeModals() {
+            try {
+                if (typeof bootstrap === 'undefined' || typeof bootstrap.Modal === 'undefined') {
+                    console.warn('Bootstrap Modal not available in pembeli layout.');
+                    return;
+                }
+                
+                const modalTriggers = document.querySelectorAll('[data-bs-toggle="modal"]');
+                console.log('Pembeli layout - Found modal triggers:', modalTriggers.length);
+                
+                modalTriggers.forEach((trigger, index) => {
+                    try {
+                        const targetId = trigger.getAttribute('data-bs-target');
+                        if (targetId) {
+                            const targetModal = document.querySelector(targetId);
+                            if (targetModal) {
+                                const modalInstance = new bootstrap.Modal(targetModal, {
+                                    backdrop: true,
+                                    keyboard: true,
+                                    focus: true
+                                });
+                                
+                                console.log(`Pembeli modal ${index + 1} initialized:`, targetId);
+                            }
+                        }
+                    } catch (error) {
+                        console.error(`Error initializing pembeli modal ${index + 1}:`, error);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Pembeli modal initialization error:', error);
+            }
+        }
             // Initialize Bootstrap tooltips
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
+            
+            // Initialize number formatting
+            initializeNumberFormatting();
+            
+            // Setup form submission handlers
+            setupFormSubmissionHandlers();
             
             // Auto-hide alerts after 5 seconds
             setTimeout(function() {
@@ -185,6 +268,84 @@
                 });
             });
         });
+        
+        // Number formatting functions
+        function initializeNumberFormatting() {
+            // Find all price inputs and apply formatting
+            const priceInputs = document.querySelectorAll('input[name*="harga"], input[name*="price"], input[type="number"][placeholder*="harga"], input[type="number"][placeholder*="price"]');
+            
+            priceInputs.forEach(input => {
+                // Set input mode for better mobile experience
+                input.setAttribute('inputmode', 'numeric');
+                
+                // Add event listeners
+                input.addEventListener('input', handleNumberInput);
+                input.addEventListener('blur', handleNumberInput);
+                input.addEventListener('focus', function() {
+                    // Remove formatting on focus for easier editing
+                    this.value = unformatNumber(this.value);
+                });
+                
+                // Format existing value if any
+                if (input.value) {
+                    input.value = formatNumber(input.value);
+                }
+            });
+        }
+
+        function handleNumberInput(e) {
+            const input = e.target;
+            let value = input.value;
+            
+            // Remove all non-digit characters except dots and commas
+            value = value.replace(/[^\d.,]/g, '');
+            
+            // Convert to number and format
+            const numericValue = unformatNumber(value);
+            if (numericValue !== '') {
+                input.value = formatNumber(numericValue);
+            }
+        }
+
+        function formatNumber(value) {
+            // Convert to string and remove any existing formatting
+            let num = value.toString().replace(/[^\d]/g, '');
+            
+            if (num === '') return '';
+            
+            // Add thousand separators
+            return num.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function unformatNumber(value) {
+            if (typeof value !== 'string') value = value.toString();
+            return value.replace(/\./g, '');
+        }
+        
+        // Global functions for forms that need manual formatting
+        window.formatCurrency = formatNumber;
+        window.unformatCurrency = unformatNumber;
+        
+        // Setup form submission handlers
+        function setupFormSubmissionHandlers() {
+            const forms = document.querySelectorAll('form');
+            
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    console.log('Pembeli form submission detected, converting formatted numbers...');
+                    
+                    const priceInputs = form.querySelectorAll('input[name="harga"], input[name*="price"], input[id="harga"]');
+                    
+                    priceInputs.forEach(input => {
+                        if (input.value && input.value.includes('.')) {
+                            const originalValue = input.value;
+                            input.value = unformatNumber(input.value);
+                            console.log(`Pembeli converted ${originalValue} → ${input.value}`);
+                        }
+                    });
+                });
+            });
+        }
         
         // Global utility functions
         function showToast(message, type = 'success') {
@@ -224,6 +385,10 @@
             `;
             return toast;
         }
+
+        // Global functions for forms that need manual formatting
+        window.formatCurrency = formatNumber;
+        window.unformatCurrency = unformatNumber;
     </script>
     @stack('scripts')
 </body>

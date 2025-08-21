@@ -1,62 +1,173 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
-
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+    <!-- Auth Header -->
+    <div class="auth-header">
+        <div class="auth-logo">
+            <i class="fas fa-user-plus"></i>
         </div>
+        <h1 class="auth-title">Bergabung dengan NganTeen</h1>
+        <p class="auth-subtitle">Buat akun baru dan nikmati kemudahan pesan makanan</p>
+    </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+    <!-- Auth Body -->
+    <div class="auth-body">
+        <form method="POST" action="{{ route('register') }}" class="auth-form">
+            @csrf
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+            <!-- Name -->
+            <div class="form-group">
+                <label for="name" class="form-label">
+                    <i class="fas fa-user"></i>
+                    Nama Lengkap
+                </label>
+                <input 
+                    id="name" 
+                    type="text" 
+                    class="form-control @error('name') is-invalid @enderror" 
+                    name="name" 
+                    value="{{ old('name') }}" 
+                    required 
+                    autofocus 
+                    autocomplete="name"
+                    placeholder="Masukkan nama lengkap Anda"
+                />
+                @error('name')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
+            <!-- Email Address -->
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <i class="fas fa-envelope"></i>
+                    Alamat Email
+                </label>
+                <input 
+                    id="email" 
+                    type="email" 
+                    class="form-control @error('email') is-invalid @enderror" 
+                    name="email" 
+                    value="{{ old('email') }}" 
+                    required 
+                    autocomplete="username"
+                    placeholder="Masukkan alamat email aktif Anda"
+                />
+                @error('email')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+            <!-- Password -->
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i>
+                    Kata Sandi
+                </label>
+                <input 
+                    id="password" 
+                    type="password" 
+                    class="form-control @error('password') is-invalid @enderror" 
+                    name="password" 
+                    required 
+                    autocomplete="new-password"
+                    placeholder="Minimal 8 karakter"
+                />
+                @error('password')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label for="password_confirmation" class="form-label">
+                    <i class="fas fa-lock"></i>
+                    Konfirmasi Kata Sandi
+                </label>
+                <input 
+                    id="password_confirmation" 
+                    type="password" 
+                    class="form-control @error('password_confirmation') is-invalid @enderror" 
+                    name="password_confirmation" 
+                    required 
+                    autocomplete="new-password"
+                    placeholder="Ketik ulang kata sandi Anda"
+                />
+                @error('password_confirmation')
+                    <div class="invalid-feedback">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
+            <!-- Role Selection -->
+            <div class="form-group">
+                <label class="form-label">
+                    <i class="fas fa-users"></i>
+                    Daftar Sebagai
+                </label>
+                <div class="role-selector">
+                    <div class="role-option">
+                        <input 
+                            type="radio" 
+                            id="role_pembeli" 
+                            name="role" 
+                            value="pembeli" 
+                            {{ old('role', 'pembeli') == 'pembeli' ? 'checked' : '' }}
+                            required
+                        />
+                        <label for="role_pembeli">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Pembeli</span>
+                        </label>
+                    </div>
+                    <div class="role-option">
+                        <input 
+                            type="radio" 
+                            id="role_penjual" 
+                            name="role" 
+                            value="penjual" 
+                            {{ old('role') == 'penjual' ? 'checked' : '' }}
+                            required
+                        />
+                        <label for="role_penjual">
+                            <i class="fas fa-store"></i>
+                            <span>Penjual</span>
+                        </label>
+                    </div>
+                </div>
+                @error('role')
+                    <div class="invalid-feedback" style="display: block;">
+                        <i class="fas fa-exclamation-circle"></i>
+                        {{ $message }}
+                    </div>
+                @enderror
+            </div>
 
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn-auth-primary">
+                <i class="fas fa-user-plus me-2"></i>
+                Buat Akun Sekarang
+            </button>
+        </form>
+    </div>
 
-        <!-- Role Selection -->
-        <div class="mt-4">
-            <x-input-label for="role" :value="__('Register as')" />
-            <select id="role" name="role" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" required>
-                <option value="pembeli">Pembeli</option>
-                <option value="penjual">Penjual</option>
-            </select>
-            <x-input-error :messages="$errors->get('role')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
+    <!-- Auth Footer -->
+    <div class="auth-footer">
+        <p>
+            Sudah punya akun? 
+            <a href="{{ route('login') }}" class="auth-link">
+                <i class="fas fa-sign-in-alt me-1"></i>
+                Masuk di sini
             </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
+        </p>
+    </div>
 </x-guest-layout>

@@ -34,7 +34,15 @@ class AuthenticatedSessionController extends Controller
         $this->updateLastLoginTimestamp();
 
         // Redirect based on role to the proper named route
-        return redirect()->intended(route('dashboard'));
+        $user = Auth::user();
+        
+        if ($user->role === 'admin') {
+            return redirect()->intended(route('admin.dashboard'));
+        } elseif ($user->role === 'penjual') {
+            return redirect()->intended(route('penjual.dashboard'));
+        } else {
+            return redirect()->intended(route('pembeli.dashboard'));
+        }
     }
 
     /**

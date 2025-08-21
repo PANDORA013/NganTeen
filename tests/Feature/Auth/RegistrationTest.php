@@ -4,11 +4,10 @@ namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-use Tests\TestCase;
+use Tests\AuthTestCase;
 
-class RegistrationTest extends TestCase
+class RegistrationTest extends AuthTestCase
 {
-    use RefreshDatabase;
 
     public function test_registration_screen_can_be_rendered(): void
     {
@@ -19,8 +18,7 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
-        $response = $this->withoutMiddleware(\App\Http\Middleware\VerifyCsrfToken::class)
-                         ->post('/register', [
+        $response = $this->postWithoutCsrf('/register', [
                              'name' => 'Test User',
                              'email' => 'test@example.com',
                              'password' => 'password',

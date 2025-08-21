@@ -25,11 +25,13 @@ class HomeController extends Controller
     public function index(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->intended(
-                Auth::user()->role === 'penjual' 
-                    ? route('penjual.dashboard') 
-                    : route('pembeli.dashboard')
-            );
+            // Redirect berdasarkan role user
+            return match(Auth::user()->role) {
+                'admin' => redirect()->route('admin.dashboard'),
+                'penjual' => redirect()->route('penjual.dashboard'),
+                'pembeli' => redirect()->route('pembeli.dashboard'),
+                default => redirect()->route('pembeli.dashboard')
+            };
         }
         
         // Ambil menu featured untuk halaman utama
