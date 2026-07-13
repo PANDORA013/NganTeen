@@ -64,7 +64,7 @@ class AdminDashboardController extends Controller
         // Top Warungs
         $top_warungs = $this->getTopWarungs();
 
-        return view('admin.dashboard_minimal', compact(
+        return view('admin.dashboard', compact(
             'stats', 
             'chart_data',
             'recent_activities',

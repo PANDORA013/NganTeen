@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "pandora013/nganteen",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Platform pemesanan dan pengelolaan kantin berbasis Laravel.",
+    "keywords": ["laravel", "kantin", "marketplace", "nganteen"],
     "license": "MIT",
     "require": {
         "php": "^8.2",

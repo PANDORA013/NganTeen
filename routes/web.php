@@ -22,21 +22,6 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 // Public routes for contact form
 Route::post('/contact', [App\Http\Controllers\Admin\ContentManagementController::class, 'storeContactMessage'])->name('contact.store');
 
-// Development test routes - remove in production
-if (app()->environment(['local', 'testing'])) {
-    Route::prefix('dev-tools')->group(function () {
-        Route::get('/test-broadcasting', fn() => view('test-broadcasting'))->name('test.broadcasting');
-        Route::get('/test-formatting', fn() => view('test-formatting'))->name('test.formatting');
-        Route::get('/test-harga', fn() => view('test-harga'))->name('test.harga');
-        Route::get('/test-submission', fn() => view('test-submission'))->name('test.submission');
-        Route::get('/test-login-penjual', fn() => view('test-login-penjual'))->name('test.login.penjual');
-        
-        // API testing routes
-        Route::post('/api/test/menu-broadcast', [App\Http\Controllers\Api\TestBroadcastController::class, 'testMenuBroadcast']);
-        Route::post('/api/test/order-broadcast', [App\Http\Controllers\Api\TestBroadcastController::class, 'testOrderBroadcast']);
-    });
-}
-
 // AJAX Cart API routes
 Route::middleware(['auth', 'role:pembeli'])->prefix('api/cart')->name('api.cart.')->group(function () {
     Route::controller(App\Http\Controllers\Api\CartApiController::class)->group(function () {

@@ -1,61 +1,86 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# NganTeen
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+NganTeen adalah platform kantin digital berbasis Laravel untuk menghubungkan pembeli, penjual, dan administrator dalam satu alur pemesanan.
 
-## About Laravel
+## Fitur utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Pembeli: jelajah menu, keranjang, checkout, riwayat pesanan, favorit, dan rating.
+- Penjual: profil warung, pengelolaan menu, pesanan, QRIS, serta payout.
+- Admin: pengelolaan pengguna, warung, transaksi, payout, konten, dan analitik.
+- Pembaruan real-time melalui Laravel Echo dan Pusher.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Teknologi
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- PHP 8.2+, Laravel 12, MySQL
+- Vite, Tailwind CSS, Bootstrap, Alpine.js
+- Laravel Echo dan Pusher
 
-## Learning Laravel
+## Struktur proyek
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```text
+app/                 Logika aplikasi, model, middleware, dan controller
+database/            Migration, factory, dan seeder
+docs/                Dokumentasi teknis dan deployment
+public/              Entry point serta aset publik
+resources/           Source CSS, JavaScript, dan Blade views
+  views/admin/        Antarmuka administrator
+  views/pembeli/      Antarmuka pembeli
+  views/penjual/      Antarmuka penjual
+routes/               Definisi route web, console, dan broadcasting
+tests/                Feature dan browser tests
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+File eksperimen, laporan pengerjaan, dan view cadangan tidak disimpan bersama source produksi. Gunakan branch atau pull request untuk menyimpan riwayat perubahan.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Menjalankan secara lokal
 
-## Laravel Sponsors
+Prasyarat: PHP 8.2+, Composer, Node.js 20+, npm, MySQL, serta ekstensi PHP `mbstring`, `xml`, `intl`, `pdo_mysql`, dan `gd`.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```bash
+git clone https://github.com/PANDORA013/NganTeen.git
+cd NganTeen
+composer install
+npm ci
+cp .env.example .env
+php artisan key:generate
+```
 
-### Premium Partners
+Buat database `nganteen_db`, sesuaikan konfigurasi `DB_*` di `.env`, lalu jalankan:
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+```bash
+php artisan migrate
+php artisan storage:link
+npm run build
+php artisan serve
+```
 
-## Contributing
+Untuk mode pengembangan frontend, gunakan `npm run dev` pada terminal terpisah.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Membuat administrator
 
-## Code of Conduct
+Jangan menyimpan password di source code. Gunakan perintah interaktif berikut:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan admin:create admin@example.com --name="Administrator"
+```
 
-## Security Vulnerabilities
+Password diminta secara tersembunyi dan harus berisi minimal 12 karakter.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Pengujian
 
-## License
+```bash
+php artisan test
+npm run build
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+GitHub Actions menjalankan build frontend, migrasi MySQL, dan Feature Tests pada setiap pull request ke `main`.
+
+## Dokumentasi
+
+- [Broadcasting](docs/BROADCASTING.md)
+- [Deployment](docs/DEPLOYMENT.md)
+- [Kebijakan keamanan](SECURITY.md)
+
+## Lisensi
+
+Proyek ini menggunakan lisensi MIT.

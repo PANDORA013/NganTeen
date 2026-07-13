@@ -12,7 +12,7 @@
                     <h1 class="text-3xl font-bold text-gray-900">Checkout</h1>
                     <p class="text-gray-600">Bayar semua pesanan dari berbagai warung sekaligus</p>
                 </div>
-                <a href="{{ route('cart.index') }}" 
+                <a href="{{ route('pembeli.cart.index') }}"
                    class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700">
                     ← Kembali ke Keranjang
                 </a>
@@ -26,7 +26,7 @@
             <div class="lg:col-span-2">
                 <div class="bg-white p-6 rounded-lg shadow mb-6">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Ringkasan Pesanan</h3>
-                    
+
                     @foreach($cartByWarung as $warungName => $items)
                         <div class="mb-6 p-4 border border-gray-200 rounded-lg">
                             <h4 class="font-medium text-gray-900 mb-3 flex items-center">
@@ -35,13 +35,13 @@
                                 </svg>
                                 {{ $warungName }}
                             </h4>
-                            
+
                             <div class="space-y-3">
                                 @foreach($items as $item)
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center space-x-3">
                                             @if($item->menu->gambar_menu)
-                                                <img src="{{ asset('storage/' . $item->menu->gambar_menu) }}" 
+                                                <img src="{{ asset('storage/' . $item->menu->gambar_menu) }}"
                                                      alt="{{ $item->menu->nama_menu }}"
                                                      class="w-12 h-12 object-cover rounded-lg">
                                             @else
@@ -51,20 +51,20 @@
                                                     </svg>
                                                 </div>
                                             @endif
-                                            
+
                                             <div>
                                                 <p class="font-medium text-gray-900">{{ $item->menu->nama_menu }}</p>
                                                 <p class="text-sm text-gray-500">Rp {{ number_format($item->menu->harga) }} x {{ $item->jumlah }}</p>
                                             </div>
                                         </div>
-                                        
+
                                         <div class="text-right">
                                             <p class="font-medium text-gray-900">Rp {{ number_format($item->menu->harga * $item->jumlah) }}</p>
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
-                            
+
                             <div class="mt-3 pt-3 border-t border-gray-200">
                                 <div class="flex justify-between font-medium text-gray-900">
                                     <span>Subtotal {{ $warungName }}:</span>
@@ -78,10 +78,10 @@
                 <!-- Payment Method -->
                 <div class="bg-white p-6 rounded-lg shadow">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Metode Pembayaran</h3>
-                    
+
                     <form id="checkoutForm" method="POST" action="{{ route('global.checkout.process') }}">
                         @csrf
-                        
+
                         <div class="space-y-4">
                             <div class="border border-gray-200 rounded-lg p-4">
                                 <label class="flex items-center cursor-pointer">
@@ -99,7 +99,7 @@
                                     </div>
                                 </label>
                             </div>
-                            
+
                             <div class="border border-gray-200 rounded-lg p-4 opacity-50">
                                 <label class="flex items-center cursor-not-allowed">
                                     <input type="radio" name="payment_method" value="bank_transfer" class="mr-3" disabled>
@@ -116,7 +116,7 @@
                                     </div>
                                 </label>
                             </div>
-                            
+
                             <div class="border border-gray-200 rounded-lg p-4 opacity-50">
                                 <label class="flex items-center cursor-not-allowed">
                                     <input type="radio" name="payment_method" value="ewallet" class="mr-3" disabled>
@@ -143,7 +143,7 @@
             <div class="lg:col-span-1">
                 <div class="bg-white p-6 rounded-lg shadow sticky top-8">
                     <h3 class="text-lg font-medium text-gray-900 mb-4">Ringkasan Pembayaran</h3>
-                    
+
                     <div class="space-y-3 mb-6">
                         @foreach($warungGroups as $warungId => $items)
                             @php $warung = $items->first()->warung; @endphp
@@ -152,7 +152,7 @@
                                 <span class="text-gray-900">Rp {{ number_format($subtotalPerWarung[$warungId]) }}</span>
                             </div>
                         @endforeach
-                        
+
                         <div class="border-t border-gray-200 pt-3 space-y-2">
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Subtotal Menu</span>
@@ -167,14 +167,14 @@
                                 <span class="text-gray-900">Rp {{ number_format($paymentFee) }}</span>
                             </div>
                         </div>
-                        
+
                         <div class="border-t border-gray-200 pt-3">
                             <div class="flex justify-between text-lg font-medium">
                                 <span class="text-gray-900">Total Bayar</span>
                                 <span class="text-green-600 font-bold">Rp {{ number_format($grossAmount) }}</span>
                             </div>
                         </div>
-                        
+
                         <!-- Payment Method Info -->
                         <div class="mt-4 p-3 bg-blue-50 rounded-lg">
                             <div class="flex items-center text-sm text-blue-700">
@@ -185,13 +185,13 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Checkout Button -->
-                    <button type="submit" form="checkoutForm" 
+                    <button type="submit" form="checkoutForm"
                             class="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 font-medium">
                         Bayar Sekarang
                     </button>
-                    
+
                     <!-- Security Info -->
                     <div class="mt-4 p-3 bg-gray-50 rounded-lg">
                         <div class="flex items-center text-sm text-gray-600">
@@ -201,7 +201,7 @@
                             Pembayaran aman dan terenkripsi
                         </div>
                     </div>
-                    
+
                     <!-- Order Info -->
                     <div class="mt-4 space-y-2 text-xs text-gray-500">
                         <p>• Setelah pembayaran berhasil, pesanan akan diteruskan ke masing-masing warung</p>
@@ -233,10 +233,10 @@
 <script>
 document.getElementById('checkoutForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     // Show loading modal
     document.getElementById('loadingModal').classList.remove('hidden');
-    
+
     // Simulate processing delay then submit
     setTimeout(() => {
         this.submit();
