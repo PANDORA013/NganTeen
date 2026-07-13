@@ -704,7 +704,7 @@
 
     <!-- Sidebar -->
     <nav class="admin-sidebar" id="adminSidebar">
-        @include('admin.partials.sidebar_minimal')
+        @include('admin.partials.sidebar')
     </nav>
 
     <!-- Main Content -->

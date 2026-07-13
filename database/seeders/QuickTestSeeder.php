@@ -15,6 +15,11 @@ class QuickTestSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->warn('QuickTestSeeder dilewati di production.');
+            return;
+        }
+
         // Create admin user if not exists
         $admin = User::firstOrCreate(
             ['email' => 'admin@nganteen.com'],

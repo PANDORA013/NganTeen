@@ -12,6 +12,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->warn('DatabaseSeeder dilewati di production. Jalankan seeder tertentu secara eksplisit bila diperlukan.');
+            return;
+        }
+
         // Create a test seller
         User::factory()->create([
             'name' => 'Test Seller',

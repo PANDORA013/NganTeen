@@ -15,6 +15,11 @@ class PaymentSystemSeeder extends Seeder
      */
     public function run(): void
     {
+        if (app()->environment('production')) {
+            $this->command?->warn('PaymentSystemSeeder dilewati di production karena membuat akun contoh.');
+            return;
+        }
+
         // Check if we have penjual users
         $users = User::where('role', 'penjual')->take(2)->get();
 
