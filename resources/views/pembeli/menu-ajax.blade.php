@@ -46,7 +46,8 @@
                                     <!-- Quantity Selector -->
                                     <div class="input-group input-group-sm mb-3">
                                         <button class="btn btn-outline-secondary btn-quantity-minus" type="button" data-target="quantity-{{ $menu->id }}">-</button>
-                                        <input type="number" class="form-control text-center quantity-input" 
+                                        <label for="quantity-{{ $menu->id }}" class="sr-only">Kuantitas untuk {{ $menu->nama }}</label>
+                                        <input type="number" name="quantity" class="form-control text-center quantity-input" 
                                                id="quantity-{{ $menu->id }}" 
                                                value="1" min="1" max="{{ $menu->stok }}" 
                                                style="max-width: 60px;">
@@ -299,7 +300,8 @@ $(document).ready(function() {
                                 <div class="mt-4">
                                     <div class="input-group mb-3">
                                         <button class="btn btn-outline-secondary btn-quantity-minus" type="button" data-target="modal-quantity-{{ $menu->id }}">-</button>
-                                        <input type="number" class="form-control text-center quantity-input" 
+                                        <label for="modal-quantity-{{ $menu->id }}" class="sr-only">Kuantitas untuk {{ $menu->nama }}</label>
+                                        <input type="number" name="quantity" class="form-control text-center quantity-input" 
                                                id="modal-quantity-{{ $menu->id }}" 
                                                value="1" min="1" max="{{ $menu->stok }}" 
                                                style="max-width: 80px;">

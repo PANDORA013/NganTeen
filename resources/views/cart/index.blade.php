@@ -40,7 +40,8 @@
                                         <div class="col-md-3">
                                             <div class="input-group">
                                                 <button class="btn btn-outline-secondary decrement" type="button">-</button>
-                                                <input type="number" class="form-control text-center quantity-input" value="{{ $item->quantity }}" min="1" max="{{ $item->menu->stok }}">
+                                                <label for="quantity_{{ $item->id }}" class="sr-only">Kuantitas untuk {{ $item->menu->nama_menu }}</label>
+                                                <input type="number" id="quantity_{{ $item->id }}" name="quantity" class="form-control text-center quantity-input" value="{{ $item->quantity }}" min="1" max="{{ $item->menu->stok }}">
                                                 <button class="btn btn-outline-secondary increment" type="button">+</button>
                                             </div>
                                         </div>

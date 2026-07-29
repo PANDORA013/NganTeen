@@ -85,11 +85,11 @@
 
         <!-- Role Info -->
         <div class="row mb-4">
-            <label class="col-sm-3 col-form-label">
+            <label for="role" class="col-sm-3 col-form-label">
                 <i class="fas fa-tag me-2"></i>Role
             </label>
             <div class="col-sm-9">
-                <input type="text" class="form-control" value="{{ ucfirst($user->role) }}" readonly>
+                <input type="text" id="role" name="role" class="form-control" value="{{ ucfirst($user->role) }}" readonly>
                 <div class="form-text">
                     <i class="fas fa-info-circle me-1"></i>Role akun tidak dapat diubah setelah registrasi
                 </div>
